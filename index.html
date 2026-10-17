@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Alunos — Karatê Completo</title>
+    <title>Cadastro de Alunos — Karatê</title>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Times New Roman', serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
         body { background: #f0f4f8; padding: 15px; }
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { text-align: center; color: #b91c1c; margin-bottom: 25px; }
@@ -18,7 +18,7 @@
         .conteudo-aba.visivel { display: block; }
         .grupo { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-        input, select, button, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; font-family: sans-serif; }
+        input, select, button, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
         button { background: #2563eb; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 5px; }
         button:hover { opacity: 0.9; }
         .btn-vermelho { background: #dc2626; }
@@ -35,12 +35,10 @@
         .cabecalho-aluno { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; }
         .dados-principais { flex: 1; min-width: 250px; }
         .historico, .pagamentos { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ccc; }
-        .entrada-hist, .linha-pagamento { display: flex; gap: 10px; margin: 8px 0; align-items: center; flex-wrap: wrap; }
-        .entrada-hist span, .linha-pagamento span { padding: 4px 10px; background: #e5e7eb; border-radius: 4px; }
+        .entrada-hist { display: flex; gap: 10px; margin: 8px 0; align-items: center; flex-wrap: wrap; }
         .busca { margin-bottom: 15px; }
         .oculto { display: none !important; }
         
-        /* Cores das faixas */
         .faixa-branca {background:#ffffff; border:1px solid #ddd;}
         .faixa-amarela {background:#fef08a;}
         .faixa-vermelha {background:#fca5a5;}
@@ -56,7 +54,6 @@
         .resumo { background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .botoes-acao { display: flex; flex-direction: column; gap: 5px; min-width: 130px; }
         
-        /* ESTILO DO DIPLOMA */
         .modal-diploma { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow: auto; }
         .modal-diploma.aberto { display: flex; }
         .diploma-container { background: white; width: 210mm; min-height: 297mm; padding: 15mm; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
@@ -91,11 +88,9 @@
         <button class="aba" data-alvo="configuracoes">⚙️ Configurações</button>
         <button class="aba" data-alvo="backup">💾 Backup</button>
     </div>
-    
-    <!-- Área de Configurações -->
+
     <div id="configuracoes" class="conteudo-aba">
-        <h2>⚙️ Dados da Academia — Para o Diploma</h2>
-        <p style="margin-bottom:20px; color:#666;">Preencha os dados da sua academia. Eles aparecerão automaticamente nos diplomas de faixa.</p>
+        <h2>⚙️ Dados da Academia</h2>
         <div class="grupo">
             <label>Nome da Academia / Dojo</label>
             <input type="text" id="nomeAcademia" placeholder="Ex: Academia de Karatê Vila Velha">
@@ -110,28 +105,24 @@
         </div>
         <div class="grupo">
             <label>Assinatura (2ª pessoa)</label>
-            <input type="text" id="assinatura2" placeholder="Ex: Presidente da Federação (opcional)">
+            <input type="text" id="assinatura2" placeholder="Opcional">
         </div>
         <button class="btn-verde" onclick="salvarConfiguracoes()">💾 Salvar Configurações</button>
     </div>
-    
-    <!-- Área de Backup -->
+
     <div id="backup" class="conteudo-aba">
-        <h2>💾 Backup e Restauração de Dados</h2>
-        <p style="margin-bottom:20px; color:#666;">Faça backup regularmente para não perder os dados dos alunos!</p>
+        <h2>💾 Backup e Restauração</h2>
         <div class="grupo">
             <h3>📥 Fazer Backup</h3>
-            <p style="margin-bottom:10px;">Baixe um arquivo com todos os dados salvos. Guarde em local seguro.</p>
             <button class="btn-verde" onclick="fazerBackup()">⬇️ Baixar Arquivo de Backup</button>
         </div>
         <div class="grupo" style="margin-top:30px; padding-top:20px; border-top:1px solid #ddd;">
             <h3>📤 Restaurar Backup</h3>
-            <p style="margin-bottom:10px;"><strong>Atenção:</strong> Isso substituirá os dados atuais! Use somente para recuperar informações.</p>
+            <p style="color:red;">⚠️ Isso substitui os dados atuais!</p>
             <input type="file" id="arquivoBackup" accept=".json" onchange="restaurarBackup(event)">
         </div>
     </div>
-    
-    <!-- Área de Cadastro -->
+
     <div id="cadastro" class="conteudo-aba visivel">
         <h2 id="titulo-form">Cadastrar Novo Aluno</h2>
         <form id="formAluno">
@@ -139,8 +130,8 @@
             <h3>📋 Dados Pessoais</h3>
             <div class="linha">
                 <div class="col grupo">
-                    <label>Nome Completo do Aluno *</label>
-                    <input type="text" id="nome" required placeholder="Digite o nome completo">
+                    <label>Nome Completo *</label>
+                    <input type="text" id="nome" required placeholder="Digite o nome">
                 </div>
                 <div class="col grupo">
                     <label>Data de Nascimento *</label>
@@ -154,21 +145,21 @@
             <div class="linha">
                 <div class="col grupo">
                     <label>Nome do Responsável</label>
-                    <input type="text" id="nomeResponsavel" placeholder="Nome da mãe/pai/responsável">
+                    <input type="text" id="nomeResponsavel">
                 </div>
                 <div class="col grupo">
-                    <label>Telefone / WhatsApp do Responsável *</label>
+                    <label>WhatsApp Resp. *</label>
                     <input type="tel" id="telefoneResponsavel" required placeholder="(27) 9xxxx-xxxx">
                 </div>
             </div>
             <div class="linha">
                 <div class="col grupo">
-                    <label>Endereço Completo</label>
-                    <input type="text" id="endereco" placeholder="Rua, número, bairro, cidade-ES">
+                    <label>Endereço</label>
+                    <input type="text" id="endereco">
                 </div>
                 <div class="col grupo">
-                    <label>Telefone do Aluno (se tiver)</label>
-                    <input type="tel" id="telefoneAluno" placeholder="(27) 9xxxx-xxxx">
+                    <label>Tel. Aluno</label>
+                    <input type="tel" id="telefoneAluno">
                 </div>
             </div>
             <div class="grupo">
@@ -176,7 +167,7 @@
                 <input type="email" id="email">
             </div>
             <div class="grupo">
-                <label>Foto do Aluno</label>
+                <label>Foto</label>
                 <input type="file" id="foto" accept="image/*" onchange="previewFoto(event)">
                 <div class="foto-preview" id="caixaFoto">📷 Sem foto</div>
             </div>
@@ -189,44 +180,43 @@
                 <div class="col grupo">
                     <label>Faixa Atual</label>
                     <select id="faixaAtual">
-                        <option value="Branca" selected>Branca</option>
-                        <option value="Amarela">Amarela</option>
-                        <option value="Vermelha">Vermelha</option>
-                        <option value="Laranja">Laranja</option>
-                        <option value="Verde">Verde</option>
-                        <option value="Roxa">Roxa</option>
-                        <option value="Marrom">Marrom</option>
-                        <option value="Preta">Preta</option>
+                        <option>Branca</option>
+                        <option>Amarela</option>
+                        <option>Vermelha</option>
+                        <option>Laranja</option>
+                        <option>Verde</option>
+                        <option>Roxa</option>
+                        <option>Marrom</option>
+                        <option>Preta</option>
                     </select>
                 </div>
                 <div class="col grupo">
-                    <label>Data do Último Exame</label>
+                    <label>Último Exame</label>
                     <input type="date" id="ultimoExame">
                 </div>
             </div>
-            <h3 style="margin-top:20px;">💰 Valor da Mensalidade (R$)</h3>
+            <h3>💰 Mensalidade (R$)</h3>
             <div class="linha">
                 <div class="col grupo">
-                    <label>Valor mensal</label>
-                    <input type="number" step="0.01" id="valorMensalidade" placeholder="0,00">
+                    <label>Valor</label>
+                    <input type="number" step="0.01" id="valorMensalidade">
                 </div>
                 <div class="col grupo">
-                    <label>Dia de vencimento</label>
-                    <input type="number" id="diaVencimento" min="1" max="31" placeholder="5">
+                    <label>Dia Vencimento</label>
+                    <input type="number" id="diaVencimento" min="1" max="31">
                 </div>
             </div>
-            <h4 style="margin-top:15px;">📜 Histórico de Promoções</h4>
+            <h4>📜 Histórico de Promoções</h4>
             <div id="areaHistorico"></div>
             <button type="button" class="btn-amarelo" onclick="adicionarLinhaHist()">+ Adicionar Promoção</button>
             <button type="submit" class="btn-verde" style="margin-top:20px;">💾 Salvar Aluno</button>
             <button type="button" class="oculto" id="btnCancelarEdicao" onclick="cancelarEdicao()">Cancelar Edição</button>
         </form>
     </div>
-    
-    <!-- Área de Lista -->
+
     <div id="lista" class="conteudo-aba">
         <h2>Alunos Cadastrados</h2>
-        <div class="linha" style="margin-bottom:15px;">
+        <div class="linha">
             <div class="col busca">
                 <label>🔍 Buscar:</label>
                 <input type="text" id="campoBusca" placeholder="Nome ou faixa..." oninput="exibirLista()">
@@ -238,20 +228,19 @@
         <div id="quantidade"></div>
         <div id="listaAlunos"></div>
     </div>
-    
-    <!-- Área de Pagamentos -->
+
     <div id="pagamentos" class="conteudo-aba">
         <h2>💰 Controle de Pagamentos</h2>
         <div class="resumo">
             <div class="linha">
-                <div class="col"><strong>Total de alunos:</strong> <span id="totalAlunos">0</span></div>
+                <div class="col"><strong>Total:</strong> <span id="totalAlunos">0</span></div>
                 <div class="col"><strong>Em dia:</strong> <span id="totalPagos" style="color:#16a34a;">0</span></div>
                 <div class="col"><strong>Pendentes:</strong> <span id="totalPendentes" style="color:#eab308;">0</span></div>
                 <div class="col"><strong>Atrasados:</strong> <span id="totalAtrasados" style="color:#dc2626;">0</span></div>
             </div>
         </div>
         <div class="busca">
-            <label>Filtrar por situação:</label>
+            <label>Filtrar:</label>
             <select id="filtroPagamento" onchange="exibirPagamentos()">
                 <option value="todos">Todos</option>
                 <option value="pago">Em dia</option>
@@ -263,7 +252,6 @@
     </div>
 </div>
 
-<!-- MODAL DO DIPLOMA -->
 <div id="modalDiploma" class="modal-diploma" onclick="fecharDiplomaClique(event)">
     <div>
         <div class="botoes-impressao">
@@ -275,7 +263,8 @@
 </div>
 
 <script>
-// --- Configurações da Academia ---
+let fotoBase64 = '';
+
 function salvarConfiguracoes() {
     const config = {
         nomeAcademia: document.getElementById('nomeAcademia').value.trim(),
@@ -284,7 +273,7 @@ function salvarConfiguracoes() {
         assinatura2: document.getElementById('assinatura2').value.trim()
     };
     localStorage.setItem('configAcademia', JSON.stringify(config));
-    alert('✅ Configurações salvas com sucesso!');
+    alert('✅ Configurações salvas!');
 }
 
 function carregarConfiguracoes() {
@@ -293,15 +282,12 @@ function carregarConfiguracoes() {
     if(cfg.cidadeAcademia) document.getElementById('cidadeAcademia').value = cfg.cidadeAcademia;
     if(cfg.nomeInstrutor) document.getElementById('nomeInstrutor').value = cfg.nomeInstrutor;
     if(cfg.assinatura2) document.getElementById('assinatura2').value = cfg.assinatura2;
-    return cfg;
 }
 carregarConfiguracoes();
 
-// --- Funções de Backup ---
 function fazerBackup() {
     const dados = {
         dataBackup: new Date().toLocaleString('pt-BR'),
-        versao: '1.2',
         alunos: carregarAlunos(),
         configuracoes: JSON.parse(localStorage.getItem('configAcademia') || '{}')
     };
@@ -312,36 +298,29 @@ function fazerBackup() {
     a.download = `backup-karate-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    alert('✅ Backup realizado com sucesso! Arquivo baixado.');
+    alert('✅ Backup baixado!');
 }
 
 function restaurarBackup(e) {
     const arq = e.target.files[0];
     if(!arq) return;
-    if(!confirm('⚠️ ATENÇÃO! Isso substituirá TODOS os dados atuais!\nTem certeza que deseja continuar?')) {
-        e.target.value = '';
-        return;
-    }
+    if(!confirm('⚠️ Vai substituir todos os dados? Tem certeza?')) { e.target.value=''; return; }
     const leitor = new FileReader();
     leitor.onload = function(ev) {
         try {
             const dados = JSON.parse(ev.target.result);
-            if(!dados.alunos) throw new Error('Formato de arquivo inválido');
+            if(!dados.alunos) throw new Error('Arquivo inválido');
             salvarAlunos(dados.alunos);
             if(dados.configuracoes) {
                 localStorage.setItem('configAcademia', JSON.stringify(dados.configuracoes));
                 carregarConfiguracoes();
             }
-            alert(`✅ Restauração concluída!\n${dados.alunos.length} alunos carregados.`);
-            e.target.value = '';
-        } catch(erro) {
-            alert('❌ Erro ao restaurar: ' + erro.message);
-        }
+            alert(`✅ Restaurado! ${dados.alunos.length} alunos.`);
+        } catch(erro) { alert('❌ Erro: ' + erro.message); }
     };
     leitor.readAsText(arq);
 }
 
-// --- Controle de Abas ---
 document.querySelectorAll('.aba').forEach(aba => {
     aba.addEventListener('click', () => {
         document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
@@ -362,7 +341,6 @@ document.querySelectorAll('.aba').forEach(aba => {
     });
 });
 
-// --- Cálculo de Idade ---
 function calcularIdade() {
     const nasc = document.getElementById('nascimento').value;
     if(!nasc) return;
@@ -374,20 +352,17 @@ function calcularIdade() {
     document.getElementById('idade').value = `${idade} anos`;
 }
 
-// --- Preview de Foto ---
-let fotoBase64 = '';
 function previewFoto(e) {
     const arq = e.target.files[0];
     if(!arq) return;
     const leitor = new FileReader();
     leitor.onload = function(ev) {
         fotoBase64 = ev.target.result;
-        document.getElementById('caixaFoto').innerHTML = `<img src="${fotoBase64}" alt="Foto do aluno">`;
+        document.getElementById('caixaFoto').innerHTML = `<img src="${fotoBase64}">`;
     };
     leitor.readAsDataURL(arq);
 }
 
-// --- Linhas de Histórico de Faixas ---
 function adicionarLinhaHist(data='', faixa='') {
     const area = document.getElementById('areaHistorico');
     const idLinha = Date.now();
@@ -409,7 +384,6 @@ function adicionarLinhaHist(data='', faixa='') {
     </div>`;
 }
 
-// --- Armazenamento ---
 function carregarAlunos() {
     return JSON.parse(localStorage.getItem('alunosKaratêCompleto') || '[]');
 }
@@ -417,16 +391,15 @@ function salvarAlunos(lista) {
     localStorage.setItem('alunosKaratêCompleto', JSON.stringify(lista));
 }
 
-// --- Envio do Formulário com VALIDAÇÃO ---
 document.getElementById('formAluno').addEventListener('submit', e => {
     e.preventDefault();
     const nome = document.getElementById('nome').value.trim();
     const nascimento = document.getElementById('nascimento').value;
     const telResp = document.getElementById('telefoneResponsavel').value.trim().replace(/\D/g,'');
     
-    if(!nome) { alert('⚠️ Preencha o Nome Completo!'); return; }
-    if(!nascimento) { alert('⚠️ Preencha a Data de Nascimento!'); return; }
-    if(telResp.length < 10) { alert('⚠️ Telefone do Responsável incompleto! Digite com DDD.'); return; }
+    if(!nome) { alert('⚠️ Preencha o nome!'); return; }
+    if(!nascimento) { alert('⚠️ Preencha a data de nascimento!'); return; }
+    if(telResp.length < 10) { alert('⚠️ Telefone incompleto!'); return; }
     
     const lista = carregarAlunos();
     const id = document.getElementById('idAluno').value || Date.now();
@@ -462,31 +435,26 @@ document.getElementById('formAluno').addEventListener('submit', e => {
     if(indice >= 0) {
         dados.pagamentos = lista[indice].pagamentos || [];
         lista[indice] = dados;
-        alert(`✅ Aluno "${dados.nome}" atualizado com sucesso!`);
+        alert(`✅ Atualizado: ${dados.nome}`);
     } else {
         lista.push(dados);
-        alert(`✅ Aluno "${dados.nome}" cadastrado com sucesso!`);
+        alert(`✅ Cadastrado: ${dados.nome}`);
     }
     salvarAlunos(lista);
     document.querySelector('[data-alvo="lista"]').click();
 });
 
-// --- Calcular Status de Pagamento ---
 function calcularStatus(aluno) {
     const hoje = new Date();
     const diaVenc = aluno.diaVencimento || 1;
     const vencimentoMes = new Date(hoje.getFullYear(), hoje.getMonth(), diaVenc);
-    
     const ultimoPagamento = aluno.pagamentos?.filter(p => p.status === 'pago')
         .sort((a,b) => new Date(b.data) - new Date(a.data))[0];
-    
-    if(!ultimoPagamento) {
-        return hoje > vencimentoMes ? 'atrasado' : 'pendente';
-    }
+    if(!ultimoPagamento) return hoje > vencimentoMes ? 'atrasado' : 'pendente';
     const dataPag = new Date(ultimoPagamento.data + 'T00:00:00');
     const proximoVenc = new Date(dataPag.getFullYear(), dataPag.getMonth() + 1, diaVenc);
     if(hoje <= proximoVenc) return 'pago';
-    return hoje > new Date(hoje.getFullYear(), hoje.getMonth(), diaVenc) ? 'atrasado' : 'pendente';
+    return hoje > vencimentoMes ? 'atrasado' : 'pendente';
 }
 
 function getStatusTexto(status) {
@@ -497,7 +465,6 @@ function getStatusTexto(status) {
     }
 }
 
-// --- 📜 GERAR DIPLOMA ---
 function gerarDiploma(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
@@ -507,34 +474,24 @@ function gerarDiploma(id) {
     const instrutor = cfg.nomeInstrutor || 'Instrutor';
     const assinatura2 = cfg.assinatura2 || '';
     
-    let dataExame;
-    if(aluno.ultimoExame) {
-        dataExame = new Date(aluno.ultimoExame + 'T00:00:00');
-    } else {
-        dataExame = new Date();
-    }
+    const dataExame = aluno.ultimoExame ? new Date(aluno.ultimoExame + 'T00:00:00') : new Date();
     const dataFormatada = dataExame.toLocaleDateString('pt-BR', {day: '2-digit', month: 'long', year: 'numeric'});
     
-    const assinatura2HTML = assinatura2 ? `
-        <div class="assinatura" style="text-align:center;">
-            <br><br>
-            <strong>${assinatura2}</strong>
-        </div>` : '';
+    const assinatura2HTML = assinatura2 ? `<div class="assinatura" style="text-align:center;"><br><br><strong>${assinatura2}</strong></div>` : '';
     
     document.getElementById('conteudoDiploma').innerHTML = `
         <div class="diploma-borda">
             <div class="diploma-titulo">${nomeAcademia}</div>
             <div class="diploma-subtitulo">${cidade}</div>
-            <h2 style="font-size: 26px; color: #8b4513; margin-bottom: 30px; text-transform: uppercase;">C E R T I F I C A D O</h2>
-            <div class="diploma-corpo">
-                Certificamos que<br>
+            <h2 style="font-size:26px; color:#8b4513; margin-bottom:30px;">C E R T I F I C A D O</h2>
+            <div class="diploma-corpo">Certificamos que<br>
                 <div class="diploma-nome">${aluno.nome}</div>
                 foi aprovado(a) no exame de graduação, conquistando a faixa<br>
                 <div class="diploma-faixa">🥋 ${aluno.faixaAtual}</div>
             </div>
             <div class="diploma-data">Concedido em ${dataFormatada}</div>
             <div class="diploma-assinaturas">
-                <div class="assinatura" style="text-align:center;"><br><br><strong>${instrutor}</strong><br>Instrutor(a) Responsável</div>
+                <div class="assinatura" style="text-align:center;"><br><br><strong>${instrutor}</strong><br>Instrutor(a)</div>
                 ${assinatura2HTML}
             </div>
         </div>`;
@@ -550,222 +507,118 @@ function fecharDiplomaClique(e) {
     if(e.target.id === 'modalDiploma') fecharDiploma();
 }
 
-// --- 🚨 MENSAGEM DE AVISO DE ATRASO ---
 function enviarAvisoAtraso(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
-    
-    const status = calcularStatus(aluno);
-    if(status !== 'atrasado') {
-        alert('✅ Este aluno não está com pagamento em atraso!');
-        return;
-    }
-    
+    if(calcularStatus(aluno) !== 'atrasado') { alert('✅ Não está em atraso!'); return; }
     const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
-    if(!tel || tel.length < 10) {
-        alert('⚠️ Telefone do Responsável não cadastrado ou incompleto!');
-        return;
-    }
-    
+    if(tel.length < 10) { alert('⚠️ Telefone inválido!'); return; }
     const valor = (aluno.valorMensalidade || 0).toFixed(2);
-    const vencimento = aluno.diaVencimento || 1;
     const nomeResp = aluno.nomeResponsavel || 'Responsável';
     const cfg = JSON.parse(localStorage.getItem('configAcademia') || {});
     const nomeAcad = cfg.nomeAcademia || 'Academia de Karatê';
-    
-    const mensagem = `⚠️ AVISO DE ATRASO NO PAGAMENTO
-
-Olá, ${nomeResp}! Tudo bem? 😊
-
-Somos da ${nomeAcad} e entramos em contato para lembrar que a mensalidade do(a) aluno(a) *${aluno.nome}* está em atraso.
-
-📋 Dados:
-• Valor: R$ ${valor}
-• Vencimento: dia ${vencimento}
-• Faixa atual: ${aluno.faixaAtual}
-
-Pedimos que regularize o pagamento o mais breve possível para não interromper as atividades. 🥋
-
-Qualquer dúvida, é só responder esta mensagem! Obrigado pela compreensão. 🙏`;
-
+    const mensagem = `⚠️ AVISO DE ATRASO\nOlá, ${nomeResp}! Somos da ${nomeAcad}. A mensalidade de ${aluno.nome} está atrasada: R$ ${valor}. Por favor regularize. Obrigado! 🙏🥋`;
     window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
 }
 
-// --- 💬 ENVIAR FICHA COMPLETA POR WHATSAPP ---
 function enviarWhatsApp(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
-    if(!aluno || !aluno.telefoneResponsavel) {
-        alert('⚠️ Telefone do Responsável não cadastrado!');
-        return;
-    }
-    
-    const mensagem = `🥋 FICHA CADASTRAL — KARATÊ
-━━━━━━━━━━━━━━━━
-📌 Aluno: ${aluno.nome}
-👤 Responsável: ${aluno.nomeResponsavel || 'Não informado'}
-📞 Tel Resp: ${aluno.telefoneResponsavel}
-${aluno.telefoneAluno ? `📞 Tel Aluno: ${aluno.telefoneAluno}` : ''}
-📅 Nascimento: ${aluno.nascimento} — ${aluno.idade}
-📍 Endereço: ${aluno.endereco || 'Não informado'}
-📧 E-mail: ${aluno.email || 'Não informado'}
-─── DADOS DA ACADEMIA ───
-📝 Matrícula: ${aluno.matricula || 'Não informada'}
-🥋 Faixa atual: ${aluno.faixaAtual}
-📅 Último exame: ${aluno.ultimoExame || 'Não registrado'}
-💰 Mensalidade: R$ ${(aluno.valorMensalidade || 0).toFixed(2)}
-📆 Vencimento: dia ${aluno.diaVencimento || 1}
-─── HISTÓRICO ───
-${aluno.historico?.map(h => `📅 ${h.data} → ${h.faixa}`).join('\n') || 'Sem registros'}
-✅ Enviado pelo sistema de cadastro`;
-    
+    if(!aluno || !aluno.telefoneResponsavel) { alert('⚠️ Telefone não cadastrado!'); return; }
+    const mensagem = `🥋 FICHA — ${aluno.nome}\nResp: ${aluno.nomeResponsavel || '-'}\nTel: ${aluno.telefoneResponsavel}\nNasc: ${aluno.nascimento} — ${aluno.idade}\nFaixa: ${aluno.faixaAtual}\nMensalidade: R$ ${(aluno.valorMensalidade||0).toFixed(2)}`;
     const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
     window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
 }
 
-// --- Exibir Lista ---
 function exibirLista() {
     const busca = document.getElementById('campoBusca').value.toLowerCase();
     let lista = carregarAlunos();
-    if(busca) lista = lista.filter(a => 
-        a.nome.toLowerCase().includes(busca) || a.faixaAtual.toLowerCase().includes(busca)
-    );
-    
-    document.getElementById('quantidade').innerHTML = `<strong>${lista.length}</strong> aluno(s) encontrado(s)`;
+    if(busca) lista = lista.filter(a => a.nome.toLowerCase().includes(busca) || a.faixaAtual.toLowerCase().includes(busca));
+    document.getElementById('quantidade').innerHTML = `<strong>${lista.length}</strong> aluno(s)`;
     const div = document.getElementById('listaAlunos');
     div.innerHTML = '';
-    
-    if(lista.length === 0) {
-        div.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Nenhum aluno cadastrado.</p>';
-        return;
-    }
-    
+    if(lista.length === 0) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno cadastrado.</p>'; return; }
     lista.forEach(aluno => {
         const status = calcularStatus(aluno);
         div.innerHTML += `
         <div class="item-aluno">
             <div class="cabecalho-aluno">
-                <div class="foto-preview" style="width:100px; height:120px;">
-                    ${aluno.foto ? `<img src="${aluno.foto}">` : '📷'}
-                </div>
+                <div class="foto-preview" style="width:100px; height:120px;">${aluno.foto ? `<img src="${aluno.foto}">` : '📷'}</div>
                 <div class="dados-principais">
                     <h3>${aluno.nome}</h3>
-                    <p>👤 Responsável: ${aluno.nomeResponsavel || 'Não informado'}</p>
+                    <p>👤 Resp: ${aluno.nomeResponsavel || '-'}</p>
                     <p>📞 Resp: ${aluno.telefoneResponsavel}</p>
-                    ${aluno.telefoneAluno ? `<p>📞 Aluno: ${aluno.telefoneAluno}</p>` : ''}
-                    <p>📅 Nasc: ${aluno.nascimento} — ${aluno.idade}</p>
-                    <p>📍 ${aluno.endereco || 'Não informado'}</p>
-                    <p>📝 Matrícula: ${aluno.matricula || 'Não informada'}</p>
-                    <p><strong>Faixa:</strong> <span class="faixa-${aluno.faixaAtual.toLowerCase()}">${aluno.faixaAtual}</span> — Último exame: ${aluno.ultimoExame || 'Não registrado'}</p>
-                    <p><strong>Mensalidade:</strong> R$ ${(aluno.valorMensalidade || 0).toFixed(2)} — Vencimento dia ${aluno.diaVencimento || 1}</p>
-                    <p><strong>Pagamento:</strong> ${getStatusTexto(status)}</p>
+                    <p>Faixa: <span class="faixa-${aluno.faixaAtual.toLowerCase()}">${aluno.faixaAtual}</span></p>
+                    <p>Pagamento: ${getStatusTexto(status)}</p>
                 </div>
                 <div class="botoes-acao">
-                    ${status === 'atrasado' ? `<button class="btn-vermelho" onclick="enviarAvisoAtraso(${aluno.id})">⚠️ Aviso Atraso</button>` : ''}
+                    ${status==='atrasado'?`<button class="btn-vermelho" onclick="enviarAvisoAtraso(${aluno.id})">⚠️ Aviso</button>`:''}
                     <button class="btn-roxo" onclick="gerarDiploma(${aluno.id})">🖨️ Diploma</button>
                     <button class="btn-amarelo" onclick="editarAluno(${aluno.id})">✏️ Editar</button>
-                    <button class="btn-azul-claro" onclick="gerarFichaPDF(${aluno.id})">📄 Ficha PDF</button>
-                    <button class="btn-whats" onclick="enviarWhatsApp(${aluno.id})">💬 Resp WhatsApp</button>
+                    <button class="btn-azul-claro" onclick="gerarFichaPDF(${aluno.id})">📄 PDF</button>
+                    <button class="btn-whats" onclick="enviarWhatsApp(${aluno.id})">💬 WhatsApp</button>
                     <button class="btn-vermelho" onclick="if(confirm('Excluir ${aluno.nome}?')){excluirAluno(${aluno.id})}">🗑️ Excluir</button>
                 </div>
             </div>
-            ${aluno.historico?.length ? `
-            <div class="historico">
-                <strong>📜 Histórico de Promoções:</strong><br>
-                ${aluno.historico.map(h => `<span>📅 ${h.data} → ${h.faixa}</span>`).join(' · ')}
-            </div>` : ''}
         </div>`;
     });
 }
 
-// --- Exibir Pagamentos ---
 function exibirPagamentos() {
     const filtro = document.getElementById('filtroPagamento').value;
     let lista = carregarAlunos();
-    
-    let totalPagos = 0, totalPendentes = 0, totalAtrasados = 0;
-    lista = lista.map(aluno => {
-        aluno.statusPagamento = calcularStatus(aluno);
-        if(aluno.statusPagamento === 'pago') totalPagos++;
-        else if(aluno.statusPagamento === 'pendente') totalPendentes++;
+    let totalPagos=0, totalPendentes=0, totalAtrasados=0;
+    lista = lista.map(a => {
+        a.statusPagamento = calcularStatus(a);
+        if(a.statusPagamento==='pago') totalPagos++;
+        else if(a.statusPagamento==='pendente') totalPendentes++;
         else totalAtrasados++;
-        return aluno;
+        return a;
     });
-    
     document.getElementById('totalAlunos').textContent = lista.length;
     document.getElementById('totalPagos').textContent = totalPagos;
     document.getElementById('totalPendentes').textContent = totalPendentes;
     document.getElementById('totalAtrasados').textContent = totalAtrasados;
-    
-    if(filtro !== 'todos') {
-        lista = lista.filter(a => a.statusPagamento === filtro);
-    }
-    
+    if(filtro!=='todos') lista = lista.filter(a => a.statusPagamento === filtro);
     const div = document.getElementById('listaPagamentos');
     div.innerHTML = '';
-    if(lista.length === 0) {
-        div.innerHTML = '<p style="text-align:center; color:#666; padding:20px;">Nenhum aluno encontrado.</p>';
-        return;
-    }
-    
+    if(lista.length===0) { div.innerHTML='<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
     lista.forEach(aluno => {
         div.innerHTML += `
         <div class="item-aluno">
             <div class="linha" style="align-items:center;">
-                <div class="col" style="flex:2;">
-                    <h4>${aluno.nome}</h4>
-                    <p>👤 Resp: ${aluno.nomeResponsavel || '-'}</p>
-                    <p>Faixa: ${aluno.faixaAtual} | Matrícula: ${aluno.matricula || '-'}</p>
-                </div>
+                <div class="col" style="flex:2;"><h4>${aluno.nome}</h4><p>Faixa: ${aluno.faixaAtual}</p></div>
+                <div class="col" style="flex:1;"><p>R$ ${(aluno.valorMensalidade||0).toFixed(2)}</p><p>Dia ${aluno.diaVencimento}</p></div>
+                <div class="col" style="flex:1;">${getStatusTexto(aluno.statusPagamento)}</div>
                 <div class="col" style="flex:1;">
-                    <p><strong>Valor:</strong> R$ ${(aluno.valorMensalidade || 0).toFixed(2)}</p>
-                    <p><strong>Vencimento:</strong> Dia ${aluno.diaVencimento || 1}</p>
-                </div>
-                <div class="col" style="flex:1;">
-                    ${getStatusTexto(aluno.statusPagamento)}
-                </div>
-                <div class="col" style="flex:1; display:flex; gap:5px; flex-wrap:wrap;">
-                    ${aluno.statusPagamento === 'atrasado' ? `<button class="btn-vermelho" style="padding:6px 8px; font-size:13px;" onclick="enviarAvisoAtraso(${aluno.id})">⚠️ Aviso</button>` : ''}
-                    <button class="btn-verde" style="padding:6px 8px; font-size:13px;" onclick="registrarPagamento(${aluno.id})">Registrar Pgto</button>
+                    ${aluno.statusPagamento==='atrasado'?`<button class="btn-vermelho" style="padding:6px;" onclick="enviarAvisoAtraso(${aluno.id})">⚠️ Aviso</button>`:''}
+                    <button class="btn-verde" style="padding:6px; margin-left:5px;" onclick="registrarPagamento(${aluno.id})">Registrar</button>
                 </div>
             </div>
-            ${aluno.pagamentos?.length ? `
-            <div class="pagamentos">
-                <strong>Histórico de pagamentos:</strong><br>
-                ${aluno.pagamentos.map(p => `<span>✅ ${p.data} — R$ ${p.valor.toFixed(2)}</span>`).join(' · ')}
-            </div>` : ''}
         </div>`;
     });
 }
 
-// --- Registrar Pagamento ---
 function registrarPagamento(id) {
     const lista = carregarAlunos();
     const aluno = lista.find(a => a.id === id);
     if(!aluno) return;
-    
-    const valor = prompt(`Valor da mensalidade para ${aluno.nome}?\nSugerido: R$ ${(aluno.valorMensalidade || 0).toFixed(2)}`);
-    if(valor === null) return;
-    
+    const valor = prompt(`Valor para ${aluno.nome}?\nSugerido: R$ ${(aluno.valorMensalidade||0).toFixed(2)}`);
+    if(valor===null) return;
     const valorFinal = parseFloat(valor.replace(',','.')) || aluno.valorMensalidade || 0;
     const data = new Date().toISOString().split('T')[0];
-    
     if(!aluno.pagamentos) aluno.pagamentos = [];
-    aluno.pagamentos.push({ data, valor: valorFinal, status: 'pago' });
-    
+    aluno.pagamentos.push({data, valor: valorFinal, status:'pago'});
     salvarAlunos(lista);
-    alert(`✅ Pagamento registrado!\nAluno: ${aluno.nome}\nValor: R$ ${valorFinal.toFixed(2)}\nData: ${data}`);
+    alert(`✅ Pgto registrado!\nValor: R$ ${valorFinal.toFixed(2)}`);
     exibirPagamentos();
 }
 
-// --- Editar / Excluir ---
 function editarAluno(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
-    
     document.querySelector('[data-alvo="cadastro"]').click();
     document.getElementById('titulo-form').textContent = 'Editar Aluno';
     document.getElementById('btnCancelarEdicao').classList.remove('oculto');
-    
     document.getElementById('idAluno').value = aluno.id;
     document.getElementById('nome').value = aluno.nome;
     document.getElementById('nomeResponsavel').value = aluno.nomeResponsavel || '';
@@ -782,131 +635,66 @@ function editarAluno(id) {
     document.getElementById('ultimoExame').value = aluno.ultimoExame || '';
     document.getElementById('valorMensalidade').value = aluno.valorMensalidade || '';
     document.getElementById('diaVencimento').value = aluno.diaVencimento || '';
-    
     document.getElementById('areaHistorico').innerHTML = '';
-    if(aluno.historico && aluno.historico.length > 0) {
-        aluno.historico.forEach(h => adicionarLinhaHist(h.data, h.faixa));
-    }
+    if(aluno.historico && aluno.historico.length>0) aluno.historico.forEach(h => adicionarLinhaHist(h.data, h.faixa));
 }
 
-function cancelarEdicao() {
-    document.querySelector('[data-alvo="lista"]').click();
-}
-
+function cancelarEdicao() { document.querySelector('[data-alvo="lista"]').click(); }
 function excluirAluno(id) {
-    if(!confirm('Tem certeza que deseja excluir este aluno? Esta ação não pode ser desfeita!')) return;
-    const lista = carregarAlunos().filter(a => a.id !== id);
-    salvarAlunos(lista);
+    if(!confirm('Confirma exclusão?')) return;
+    salvarAlunos(carregarAlunos().filter(a => a.id !== id));
     exibirLista();
 }
 
-// --- Exportar Excel ---
 function exportarExcel() {
     const lista = carregarAlunos();
-    if(!lista.length) { alert('Nenhum dado para exportar!'); return; }
-    
-    const cabecalho = ['Nome Aluno', 'Responsável', 'Tel Resp', 'Tel Aluno', 'Nascimento', 'Idade', 'Endereço', 'E-mail', 'Matrícula', 'Faixa Atual', 'Último Exame', 'Valor Mensalidade', 'Dia Vencimento', 'Status Pagamento'];
+    if(!lista.length) { alert('Sem dados!'); return; }
+    const cab = ['Nome','Resp','Tel Resp','Nasc','Faixa','Valor','Vencimento','Status'];
     const linhas = lista.map(a => [
-        a.nome, a.nomeResponsavel || '', a.telefoneResponsavel, a.
-.nomeResponsavel || '',
-        a.telefoneResponsavel,
-        a.telefoneAluno || '',
-        a.nascimento,
-        a.idade,
-        a.endereco || '',
-        a.email || '',
-        a.matricula || '',
-        a.faixaAtual,
-        a.ultimoExame || '',
-        (a.valorMensalidade || 0).toFixed(2).replace('.', ','),
-        a.diaVencimento || 1,
-        calcularStatus(a)
+        a.nome, a.nomeResponsavel||'', a.telefoneResponsavel, a.nascimento, a.faixaAtual,
+        (a.valorMensalidade||0).toFixed(2).replace('.',','), a.diaVencimento||1, calcularStatus(a)
     ]);
-
-    let csv = cabecalho.join(';') + '\n';
-    linhas.forEach(linha => {
-        csv += linha.join(';') + '\n';
-    });
-
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    let csv = cab.join(';')+'\n';
+    linhas.forEach(l => csv += l.join(';')+'\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `alunos-karate-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
+    a.download = `alunos-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
     a.click();
     URL.revokeObjectURL(url);
-    alert('✅ Exportado com sucesso! Abra no Excel ou Planilhas Google.');
+    alert('✅ Exportado! Abra no Excel.');
 }
 
-// --- 📄 GERAR FICHA EM PDF (pdfmake) ---
 function gerarFichaPDF(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
-
     const cfg = JSON.parse(localStorage.getItem('configAcademia') || {});
-    const nomeAcademia = cfg.nomeAcademia || 'Academia de Karatê';
-    const cidade = cfg.cidadeAcademia || '';
-
-    const historicoTexto = aluno.historico?.length
-        ? aluno.historico.map(h => `${h.data} — ${h.faixa}`).join('\n')
-        : 'Sem registros';
-
-    const docDefinition = {
-        pageSize: 'A4',
-        pageMargins: [40, 40, 40, 40],
+    const nomeAcad = cfg.nomeAcademia || 'Academia de Karatê';
+    const hist = aluno.historico?.length ? aluno.historico.map(h => `${h.data} — ${h.faixa}`).join('\n') : 'Sem registros';
+    const doc = {
+        pageSize:'A4',
         content: [
-            { text: nomeAcademia, fontSize: 20, bold: true, alignment: 'center', margin: [0, 0, 0, 5] },
-            { text: cidade, fontSize: 12, alignment: 'center', margin: [0, 0, 0, 20] },
-            { text: 'FICHA CADASTRAL DO ALUNO', fontSize: 16, bold: true, alignment: 'center', margin: [0, 0, 0, 20] },
-
-            { text: '📋 Dados Pessoais', fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
-            {
-                table: {
-                    widths: ['30%', '70%'],
-                    body: [
-                        ['Nome:', aluno.nome],
-                        ['Responsável:', aluno.nomeResponsavel || '—'],
-                        ['Tel. Responsável:', aluno.telefoneResponsavel],
-                        ['Tel. Aluno:', aluno.telefoneAluno || '—'],
-                        ['Nascimento:', `${aluno.nascimento} (${aluno.idade})`],
-                        ['Endereço:', aluno.endereco || '—'],
-                        ['E-mail:', aluno.email || '—']
-                    ]
-                },
-                margin: [0, 0, 0, 15]
-            },
-
-            { text: '🥋 Dados da Academia', fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
-            {
-                table: {
-                    widths: ['30%', '70%'],
-                    body: [
-                        ['Matrícula:', aluno.matricula || '—'],
-                        ['Faixa Atual:', aluno.faixaAtual],
-                        ['Último Exame:', aluno.ultimoExame || '—'],
-                        ['Valor Mensalidade:', `R$ ${(aluno.valorMensalidade || 0).toFixed(2).replace('.', ',')}`],
-                        ['Vencimento:', `Dia ${aluno.diaVencimento || 1}`]
-                    ]
-                },
-                margin: [0, 0, 0, 15]
-            },
-
-            { text: '📜 Histórico de Promoções', fontSize: 14, bold: true, margin: [0, 10, 0, 5] },
-            { text: historicoTexto, margin: [0, 0, 0, 15] },
-
-            { text: `Data de emissão: ${new Date().toLocaleDateString('pt-BR')}`, fontSize: 10, italics: true, alignment: 'right', margin: [0, 30, 0, 0] }
+            {text:nomeAcad, fontSize:20, bold:true, alignment:'center', margin:[0,0,0,5]},
+            {text:'FICHA CADASTRAL', fontSize:16, bold:true, alignment:'center', margin:[0,0,0,20]},
+            {text:'📋 Dados Pessoais', bold:true, fontSize:14, margin:[0,10,0,5]},
+            {table:{widths:['30%','70%'], body:[
+                ['Nome:', aluno.nome],
+                ['Responsável:', aluno.nomeResponsavel||'—'],
+                ['Tel.:', aluno.telefoneResponsavel],
+                ['Nascimento:', `${aluno.nascimento} (${aluno.idade})`]
+            ]}, margin:[0,0,0,15]},
+            {text:'🥋 Academia', bold:true, fontSize:14, margin:[0,10,0,5]},
+            {table:{widths:['30%','70%'], body:[
+                ['Faixa:', aluno.faixaAtual],
+                ['Mensalidade:', `R$ ${(aluno.valorMensalidade||0).toFixed(2).replace('.',',')}`]
+            ]}, margin:[0,0,0,15]},
+            {text:'📜 Histórico', bold:true, fontSize:14, margin:[0,10,0,5]},
+            {text:hist}
         ],
-        defaultStyle: {
-            font: 'Roboto',
-            fontSize: 11,
-            lineHeight: 1.4
-        },
-        styles: {
-            tableHeader: { bold: true }
-        }
+        defaultStyle:{fontSize:11}
     };
-
-    pdfMake.createPdf(docDefinition).download(`ficha-${aluno.nome.replaceAll(' ', '_')}.pdf`);
+    pdfMake.createPdf(doc).download(`ficha_${aluno.nome.replaceAll(' ','_')}.pdf`);
 }
 </script>
 </body>
