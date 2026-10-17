@@ -3,21 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Cadastro de Alunos — Karatê</title>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif !important; }
         html { font-size: 16px; }
-        body { 
-            background: #f0f4f8 !important; 
-            padding: 15px !important; 
-            font-family: sans-serif !important;
-            display: block !important;
-        }
+        body { background: #f0f4f8; padding: 15px; }
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { text-align: center; color: #b91c1c; margin-bottom: 25px; }
+        h3 { margin: 20px 0 10px; color: #333; }
         .abas { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
         .aba { padding: 12px 20px; background: #ddd; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         .aba.ativa { background: #b91c1c; color: white; }
@@ -25,27 +20,25 @@
         .conteudo-aba.visivel { display: block; }
         .grupo { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-        input, select, button, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; font-family: sans-serif; }
+        input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
         button { background: #2563eb; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 5px; }
         button:hover { opacity: 0.9; }
         .btn-vermelho { background: #dc2626; }
         .btn-verde { background: #16a34a; }
         .btn-amarelo { background: #eab308; color: #222; }
-        .btn-whats { background: #25d366; }
         .btn-azul-claro { background: #0ea5e9; }
+        .btn-laranja { background: #f97316; }
         .btn-roxo { background: #7c3aed; }
+        .btn-whats { background: #25d366; }
         .linha { display: flex; gap: 15px; flex-wrap: wrap; }
         .col { flex: 1; min-width: 200px; }
-        .foto-preview { width: 150px; height: 180px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; margin-bottom: 10px; }
-        .foto-preview img { width: 100%; height: 100%; object-fit: cover; }
-        .item-aluno { border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin-bottom: 12px; background: #fafafa; }
+        .item-aluno { border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin: 12px 0; background: #fafafa; }
         .cabecalho-aluno { display: flex; gap: 15px; flex-wrap: wrap; align-items: flex-start; }
         .dados-principais { flex: 1; min-width: 250px; }
-        .historico, .pagamentos { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #ccc; }
         .entrada-hist { display: flex; gap: 10px; margin: 8px 0; align-items: center; flex-wrap: wrap; }
         .busca { margin-bottom: 15px; }
         .oculto { display: none !important; }
-        .faixa-branca {background:#ffffff; border:1px solid #ddd;}
+        .faixa-branca {background:#fff; border:1px solid #ddd;}
         .faixa-amarela {background:#fef08a;}
         .faixa-vermelha {background:#fca5a5;}
         .faixa-laranja {background:#fed7aa;}
@@ -56,23 +49,23 @@
         .status-pago { background: #bbf7d0; color: #065f46; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         .status-pendente { background: #fef08a; color: #854d0e; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         .status-atrasado { background: #fecaca; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+        .saldo-devedor { background: #fee2e2; color: #991b1b; padding: 5px 10px; border-radius: 4px; font-weight: bold; margin-top: 5px; display: inline-block; }
+        .saldo-exame { background: #e0e7ff; color: #3730a3; padding: 5px 10px; border-radius: 4px; font-weight: bold; margin-top: 5px; display: inline-block; }
         .resumo { background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
-        .botoes-acao { display: flex; flex-direction: column; gap: 5px; min-width: 130px; }
+        .botoes-acao { display: flex; flex-direction: column; gap: 5px; min-width: 140px; }
+        .secao-exame { background: #f8fafc; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #7c3aed; }
+        .lista-pagamentos { margin-top: 10px; font-size: 14px; }
+        .pagamento-item { padding: 4px 0; border-bottom: 1px solid #eee; }
         .modal-diploma { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow: auto; }
         .modal-diploma.aberto { display: flex; }
-        .diploma-container { background: white; width: 210mm; min-height: 297mm; padding: 15mm; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
-        .diploma-borda { border: 8px double #8b4513; width: 100%; height: 100%; padding: 20mm; text-align: center; position: relative; }
-        .diploma-borda::before { content: ''; position: absolute; top: 10mm; left: 10mm; right: 10mm; bottom: 10mm; border: 2px solid #8b4513; }
+        .diploma-container { background: white; width: 210mm; min-height: 297mm; padding: 15mm; position: relative; }
+        .diploma-borda { border: 8px double #8b4513; width: 100%; height: 100%; padding: 20mm; text-align: center; }
         .diploma-titulo { font-size: 32px; font-weight: bold; color: #8b4513; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
-        .diploma-subtitulo { font-size: 18px; color: #555; margin-bottom: 30px; }
-        .diploma-corpo { font-size: 18px; line-height: 2; color: #333; margin-bottom: 40px; }
         .diploma-nome { font-size: 28px; font-weight: bold; margin: 20px 0; color: #b91c1c; text-transform: uppercase; }
         .diploma-faixa { font-size: 24px; font-weight: bold; color: #2563eb; margin: 15px 0; }
-        .diploma-data { font-size: 16px; margin-top: 20px; }
-        .diploma-assinaturas { display: flex; justify-content: space-between; margin-top: 60px; font-size: 14px; }
+        .diploma-assinaturas { display: flex; justify-content: space-between; margin-top: 60px; }
         .assinatura { border-top: 1px solid #333; width: 200px; padding-top: 10px; }
         .botoes-impressao { position: sticky; top: 10px; text-align: center; margin-bottom: 15px; z-index: 1001; }
-        .botoes-impressao button { margin: 0 10px; padding: 12px 30px; font-size: 16px; }
         .aviso-sistema { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 15px; margin-bottom: 20px; border-radius: 4px; }
         @media print {
             .botoes-impressao, .botoes-acao, .abas, .container > h1 { display: none !important; }
@@ -85,8 +78,7 @@
 <body>
 <div class="container">
     <div id="avisoSistema" class="aviso-sistema oculto"></div>
-    
-    <h1>🥋 Cadastro de Alunos — Karatê</h1>
+    <h1>🥋 Cadastro de Alunos — Dojo de Karatê Sansei Roberto</h1>
     <div class="abas">
         <button class="aba ativa" data-alvo="cadastro">Novo Aluno</button>
         <button class="aba" data-alvo="lista">Lista</button>
@@ -97,36 +89,18 @@
 
     <div id="configuracoes" class="conteudo-aba">
         <h2>⚙️ Dados da Academia</h2>
-        <div class="grupo">
-            <label>Nome da Academia / Dojo</label>
-            <input type="text" id="nomeAcademia" placeholder="Ex: Academia de Karatê Vila Velha">
-        </div>
-        <div class="grupo">
-            <label>Cidade / Estado</label>
-            <input type="text" id="cidadeAcademia" placeholder="Ex: Vila Velha — ES">
-        </div>
-        <div class="grupo">
-            <label>Nome do Instrutor / Sensei</label>
-            <input type="text" id="nomeInstrutor" placeholder="Ex: Carlos Silva">
-        </div>
-        <div class="grupo">
-            <label>Assinatura (2ª pessoa)</label>
-            <input type="text" id="assinatura2" placeholder="Opcional">
-        </div>
-        <button id="btnSalvarConfig" class="btn-verde">💾 Salvar Configurações</button>
+        <div class="grupo"><label>Nome da Academia</label><input type="text" id="nomeAcademia"></div>
+        <div class="grupo"><label>Cidade/UF</label><input type="text" id="cidadeAcademia"></div>
+        <div class="grupo"><label>Nome do Instrutor</label><input type="text" id="nomeInstrutor"></div>
+        <div class="grupo"><label>2ª Assinatura</label><input type="text" id="assinatura2"></div>
+        <button id="btnSalvarConfig" class="btn-verde">💾 Salvar</button>
     </div>
 
     <div id="backup" class="conteudo-aba">
-        <h2>💾 Backup e Restauração</h2>
-        <div class="grupo">
-            <h3>📥 Fazer Backup</h3>
-            <p style="margin-bottom:10px;">Baixe e guarde em local seguro!</p>
-            <button id="btnBackup" class="btn-verde">⬇️ Baixar Arquivo de Backup</button>
-        </div>
+        <h2>💾 Backup</h2>
+        <div class="grupo"><h3>Baixar</h3><button id="btnBackup" class="btn-verde">⬇️ Baixar Backup</button></div>
         <div class="grupo" style="margin-top:30px; padding-top:20px; border-top:1px solid #ddd;">
-            <h3>📤 Restaurar Backup</h3>
-            <p style="color:red; margin-bottom:10px;">⚠️ Substitui os dados atuais!</p>
-            <input type="file" id="arquivoBackup" accept=".json">
+            <h3>Restaurar ⚠️</h3><input type="file" id="arquivoBackup" accept=".json">
         </div>
     </div>
 
@@ -136,100 +110,61 @@
             <input type="hidden" id="idAluno">
             <h3>📋 Dados Pessoais</h3>
             <div class="linha">
-                <div class="col grupo">
-                    <label>Nome Completo *</label>
-                    <input type="text" id="nome" required placeholder="Digite o nome">
-                </div>
-                <div class="col grupo">
-                    <label>Data de Nascimento *</label>
-                    <input type="date" id="nascimento" required>
-                </div>
-                <div class="col grupo">
-                    <label>Idade</label>
-                    <input type="text" id="idade" readonly>
-                </div>
+                <div class="col grupo"><label>Nome Completo *</label><input type="text" id="nome" required></div>
+                <div class="col grupo"><label>Nascimento *</label><input type="date" id="nascimento" required></div>
+                <div class="col grupo"><label>Idade</label><input type="text" id="idade" readonly></div>
             </div>
             <div class="linha">
-                <div class="col grupo">
-                    <label>Nome do Responsável</label>
-                    <input type="text" id="nomeResponsavel">
-                </div>
-                <div class="col grupo">
-                    <label>WhatsApp Resp. *</label>
-                    <input type="tel" id="telefoneResponsavel" required placeholder="(27) 9xxxx-xxxx">
-                </div>
+                <div class="col grupo"><label>Responsável</label><input type="text" id="nomeResponsavel"></div>
+                <div class="col grupo"><label>WhatsApp Resp. *</label><input type="tel" id="telefoneResponsavel" required></div>
             </div>
             <div class="linha">
-                <div class="col grupo">
-                    <label>Endereço</label>
-                    <input type="text" id="endereco">
-                </div>
-                <div class="col grupo">
-                    <label>Tel. Aluno</label>
-                    <input type="tel" id="telefoneAluno">
-                </div>
+                <div class="col grupo"><label>Endereço</label><input type="text" id="endereco"></div>
+                <div class="col grupo"><label>Tel. Aluno</label><input type="tel" id="telefoneAluno"></div>
             </div>
-            <div class="grupo">
-                <label>E-mail</label>
-                <input type="email" id="email">
-            </div>
-            <div class="grupo">
-                <label>Foto</label>
-                <input type="file" id="foto" accept="image/*">
-                <div class="foto-preview" id="caixaFoto">📷 Sem foto</div>
-            </div>
-            <h3 style="margin-top:25px;">🥋 Dados da Academia</h3>
+            <div class="grupo"><label>E-mail</label><input type="email" id="email"></div>
+            
+            <h3>🥋 Academia</h3>
             <div class="linha">
-                <div class="col grupo">
-                    <label>Data de Matrícula</label>
-                    <input type="date" id="matricula">
-                </div>
-                <div class="col grupo">
-                    <label>Faixa Atual</label>
+                <div class="col grupo"><label>Matrícula</label><input type="date" id="matricula"></div>
+                <div class="col grupo"><label>Faixa Atual</label>
                     <select id="faixaAtual">
-                        <option>Branca</option>
-                        <option>Amarela</option>
-                        <option>Vermelha</option>
-                        <option>Laranja</option>
-                        <option>Verde</option>
-                        <option>Roxa</option>
-                        <option>Marrom</option>
-                        <option>Preta</option>
+                        <option>Branca</option><option>Amarela</option><option>Vermelha</option>
+                        <option>Laranja</option><option>Verde</option><option>Roxa</option>
+                        <option>Marrom</option><option>Preta</option>
                     </select>
                 </div>
-                <div class="col grupo">
-                    <label>Último Exame</label>
-                    <input type="date" id="ultimoExame">
-                </div>
+                <div class="col grupo"><label>Último Exame</label><input type="date" id="ultimoExame"></div>
             </div>
-            <h3>💰 Mensalidade (R$)</h3>
+
+            <h3>💰 Mensalidade</h3>
             <div class="linha">
-                <div class="col grupo">
-                    <label>Valor</label>
-                    <input type="number" step="0.01" id="valorMensalidade">
-                </div>
-                <div class="col grupo">
-                    <label>Dia Vencimento</label>
-                    <input type="number" id="diaVencimento" min="1" max="31">
+                <div class="col grupo"><label>Valor Mensalidade</label><input type="number" step="0.01" id="valorMensalidade"></div>
+                <div class="col grupo"><label>Dia Vencimento</label><input type="number" id="diaVencimento" min="1" max="31"></div>
+            </div>
+
+            <div class="secao-exame">
+                <h3 style="margin-top:0;">🎓 Taxa de Exame</h3>
+                <div class="linha">
+                    <div class="col grupo"><label>Valor Taxa Exame</label><input type="number" step="0.01" id="valorExameFaixa"></div>
+                    <div class="col grupo"><label>Data Prevista Exame</label><input type="date" id="dataPrevExame"></div>
                 </div>
             </div>
+
             <h4>📜 Histórico de Promoções</h4>
             <div id="areaHistorico"></div>
-            <button type="button" id="btnAddHist" class="btn-amarelo">+ Adicionar Promoção</button>
+            <button type="button" id="btnAddHist" class="btn-amarelo">+ Adicionar</button>
             <button type="submit" class="btn-verde" style="margin-top:20px;">💾 Salvar Aluno</button>
-            <button type="button" class="oculto" id="btnCancelarEdicao">Cancelar Edição</button>
+            <button type="button" class="oculto" id="btnCancelarEdicao">Cancelar</button>
         </form>
     </div>
 
     <div id="lista" class="conteudo-aba">
         <h2>Alunos Cadastrados</h2>
         <div class="linha">
-            <div class="col busca">
-                <label>🔍 Buscar:</label>
-                <input type="text" id="campoBusca" placeholder="Nome ou faixa...">
-            </div>
+            <div class="col busca"><label>🔍 Buscar</label><input type="text" id="campoBusca"></div>
             <div class="col" style="display:flex; gap:8px; align-items:flex-end;">
-                <button id="btnExportar" class="btn-azul-claro">📊 Exportar Excel</button>
+                <button id="btnExportar" class="btn-azul-claro">📊 Excel</button>
             </div>
         </div>
         <div id="quantidade"></div>
@@ -241,9 +176,13 @@
         <div class="resumo">
             <div class="linha">
                 <div class="col"><strong>Total:</strong> <span id="totalAlunos">0</span></div>
-                <div class="col"><strong>Em dia:</strong> <span id="totalPagos" style="color:#16a34a;">0</span></div>
-                <div class="col"><strong>Pendentes:</strong> <span id="totalPendentes" style="color:#eab308;">0</span></div>
-                <div class="col"><strong>Atrasados:</strong> <span id="totalAtrasados" style="color:#dc2626;">0</span></div>
+                <div class="col"><strong>Em dia:</strong> <span id="totalPagos" style="color:green;">0</span></div>
+                <div class="col"><strong>Pendentes:</strong> <span id="totalPendentes" style="color:orange;">0</span></div>
+                <div class="col"><strong>Atrasados:</strong> <span id="totalAtrasados" style="color:red;">0</span></div>
+            </div>
+            <div class="linha" style="margin-top:10px;">
+                <div class="col"><strong>Saldo Mensal:</strong> <span id="saldoTotal" style="color:red; font-weight:bold;">R$ 0,00</span></div>
+                <div class="col"><strong>Saldo Exame:</strong> <span id="saldoExameTotal" style="color:#7c3aed; font-weight:bold;">R$ 0,00</span></div>
             </div>
         </div>
         <div class="busca">
@@ -253,6 +192,8 @@
                 <option value="pago">Em dia</option>
                 <option value="pendente">Pendentes</option>
                 <option value="atrasado">Atrasados</option>
+                <option value="comSaldo">Saldo Mensal</option>
+                <option value="comSaldoExame">Saldo Exame</option>
             </select>
         </div>
         <div id="listaPagamentos"></div>
@@ -270,254 +211,272 @@
 </div>
 
 <script>
-const avisoEl = document.getElementById('avisoSistema');
-function mostrarAviso(texto, tipo='info') {
-    avisoEl.textContent = texto;
-    avisoEl.classList.remove('oculto');
-    avisoEl.style.background = tipo === 'erro' ? '#fee2e2' : tipo === 'ok' ? '#d1fae5' : '#fef3c7';
-    avisoEl.style.borderColor = tipo === 'erro' ? '#ef4444' : tipo === 'ok' ? '#10b981' : '#f59e0b';
-    setTimeout(() => avisoEl.classList.add('oculto'), 5000);
+// === FUNÇÕES AUXILIARES ===
+function carregarAlunos() {
+    try { return JSON.parse(localStorage.getItem('alunosKaratêCompleto') || '[]'); }
+    catch { return []; }
 }
-
-function verificarPdfMake() {
-    if(typeof pdfmake !== 'undefined' && pdfmake !== null) return true;
-    mostrarAviso('⚠️ Biblioteca de PDF não carregada.', 'erro');
-    return false;
+function salvarAlunos(lista) { localStorage.setItem('alunosKaratêCompleto', JSON.stringify(lista)); }
+function carregarConfig() {
+    try { return JSON.parse(localStorage.getItem('configAcademia') || '{}'); }
+    catch { return {}; }
 }
-
-function verificarStorage() {
-    try {
-        const testeChave = '__teste_karoate__';
-        localStorage.setItem(testeChave, 'ok');
-        localStorage.removeItem(testeChave);
-        return true;
-    } catch(e) {
-        mostrarAviso('⚠️ Armazenamento bloqueado. Não use modo anônimo!', 'erro');
-        return false;
-    }
-}
-
-const storageOk = verificarStorage();
-let fotoBase64 = '';
-
-function salvarConfiguracoes() {
-    if(!storageOk) return;
-    const config = {
+function salvarConfig() {
+    const cfg = {
         nomeAcademia: document.getElementById('nomeAcademia').value.trim(),
         cidadeAcademia: document.getElementById('cidadeAcademia').value.trim(),
         nomeInstrutor: document.getElementById('nomeInstrutor').value.trim(),
         assinatura2: document.getElementById('assinatura2').value.trim()
     };
-    localStorage.setItem('configAcademia', JSON.stringify(config));
-    alert('✅ Configurações salvas!');
+    localStorage.setItem('configAcademia', JSON.stringify(cfg));
+    alert('✅ Salvo!');
 }
 
-function carregarConfiguracoes() {
-    if(!storageOk) return {};
-    try {
-        const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
-        if(cfg.nomeAcademia) document.getElementById('nomeAcademia').value = cfg.nomeAcademia;
-        if(cfg.cidadeAcademia) document.getElementById('cidadeAcademia').value = cfg.cidadeAcademia;
-        if(cfg.nomeInstrutor) document.getElementById('nomeInstrutor').value = cfg.nomeInstrutor;
-        if(cfg.assinatura2) document.getElementById('assinatura2').value = cfg.assinatura2;
-        return cfg;
-    } catch { return {}; }
+// === CÁLCULOS ===
+function calcularSaldoMensal(aluno) {
+    const totalPago = (aluno.pagamentos || []).reduce((soma, p) => soma + (Number(p.valor) || 0), 0);
+    return Math.max(0, (aluno.valorMensalidade || 0) - totalPago);
 }
-
-function carregarAlunos() {
-    if(!storageOk) return [];
-    try { return JSON.parse(localStorage.getItem('alunosKaratêCompleto') || '[]'); }
-    catch { return []; }
+function calcularSaldoExame(aluno) {
+    const totalPago = (aluno.pagamentosExame || []).reduce((soma, p) => soma + (Number(p.valor) || 0), 0);
+    return Math.max(0, (aluno.valorExameFaixa || 0) - totalPago);
 }
-
-function salvarAlunos(lista) {
-    if(!storageOk) return;
-    localStorage.setItem('alunosKaratêCompleto', JSON.stringify(lista));
-}
-
-function fazerBackup() {
-    const dados = {
-        dataBackup: new Date().toLocaleString('pt-BR'),
-        alunos: carregarAlunos(),
-        configuracoes: JSON.parse(localStorage.getItem('configAcademia') || '{}')
-    };
-    const blob = new Blob([JSON.stringify(dados, null, 2)], {type: 'application/json'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `backup-karate-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    alert('✅ Backup baixado!');
-}
-
-function restaurarBackup(arquivo) {
-    if(!arquivo) return;
-    if(!confirm('⚠️ Vai substituir todos os dados? Tem certeza?')) return;
-    const leitor = new FileReader();
-    leitor.onload = function(ev) {
-        try {
-            const dados = JSON.parse(ev.target.result);
-            if(!dados.alunos) throw new Error('Arquivo inválido');
-            salvarAlunos(dados.alunos);
-            if(dados.configuracoes) {
-                localStorage.setItem('configAcademia', JSON.stringify(dados.configuracoes));
-                carregarConfiguracoes();
-            }
-            alert(`✅ Restaurado! ${dados.alunos.length} alunos.`);
-        } catch(erro) { alert('❌ Erro: ' + erro.message); }
-    };
-    leitor.readAsText(arquivo);
-}
-
-document.querySelectorAll('.aba').forEach(aba => {
-    aba.addEventListener('click', () => {
-        document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
-        document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
-        aba.classList.add('ativa');
-        const alvo = aba.getAttribute('data-alvo');
-        document.getElementById(alvo).classList.add('visivel');
-        if(alvo === 'lista') exibirLista();
-        if(alvo === 'pagamentos') exibirPagamentos();
-        if(alvo === 'cadastro') limparFormulario();
-    });
-});
-
-function limparFormulario() {
-    document.getElementById('titulo-form').textContent = 'Cadastrar Novo Aluno';
-    document.getElementById('btnCancelarEdicao').classList.add('oculto');
-    document.getElementById('formAluno').reset();
-    document.getElementById('idAluno').value = '';
-    fotoBase64 = '';
-    document.getElementById('caixaFoto').innerHTML = '📷 Sem foto';
-    document.getElementById('areaHistorico').innerHTML = '';
-}
-
-function calcularIdade() {
-    const nasc = document.getElementById('nascimento').value;
-    if(!nasc) return;
-    const hoje = new Date();
-    const nascimento = new Date(nasc + 'T00:00:00');
-    let idade = hoje.getFullYear() - nascimento.getFullYear();
-    const m = hoje.getMonth() - nascimento.getMonth();
-    if (m < 0 || (m === 0 && hoje.getDate() < nascimento.getDate())) idade--;
-    document.getElementById('idade').value = `${idade} anos`;
-}
-
-function previewFoto(arquivo) {
-    if(!arquivo) return;
-    const leitor = new FileReader();
-    leitor.onload = function(ev) {
-        fotoBase64 = ev.target.result;
-        document.getElementById('caixaFoto').innerHTML = `<img src="${fotoBase64}">`;
-    };
-    leitor.readAsDataURL(arquivo);
-}
-
-function adicionarLinhaHist(data='', faixa='') {
-    const area = document.getElementById('areaHistorico');
-    const div = document.createElement('div');
-    div.className = 'entrada-hist';
-    div.innerHTML = `
-        <input type="date" class="dataExame" value="${data}">
-        <select class="faixaConquistada">
-            <option value="">Selecione</option>
-            <option ${faixa==='Branca'?'selected':''}>Branca</option>
-            <option ${faixa==='Amarela'?'selected':''}>Amarela</option>
-            <option ${faixa==='Vermelha'?'selected':''}>Vermelha</option>
-            <option ${faixa==='Laranja'?'selected':''}>Laranja</option>
-            <option ${faixa==='Verde'?'selected':''}>Verde</option>
-            <option ${faixa==='Roxa'?'selected':''}>Roxa</option>
-            <option ${faixa==='Marrom'?'selected':''}>Marrom</option>
-            <option ${faixa==='Preta'?'selected':''}>Preta</option>
-        </select>
-        <button type="button" class="btn-vermelho" style="width:auto; padding:6px 10px;">✕</button>
-    `;
-    div.querySelector('.btn-vermelho').addEventListener('click', () => div.remove());
-    area.appendChild(div);
-}
-
 function calcularStatus(aluno) {
     const hoje = new Date();
-    const diaVenc = aluno.diaVencimento || 1;
-    const vencimentoMes = new Date(hoje.getFullYear(), hoje.getMonth(), diaVenc);
-    const ultimoPagamento = aluno.pagamentos?.filter(p => p.status === 'pago')
-        .sort((a,b) => new Date(b.data) - new Date(a.data))[0];
-    if(!ultimoPagamento) return hoje > vencimentoMes ? 'atrasado' : 'pendente';
-    const dataPag = new Date(ultimoPagamento.data + 'T00:00:00');
-    const proximoVenc = new Date(dataPag.getFullYear(), dataPag.getMonth() + 1, diaVenc);
-    return hoje <= proximoVenc ? 'pago' : hoje > vencimentoMes ? 'atrasado' : 'pendente';
+    const venc = new Date(hoje.getFullYear(), hoje.getMonth(), aluno.diaVencimento || 1);
+    const ultimo = (aluno.pagamentos || []).sort((a,b) => new Date(b.data) - new Date(a.data))[0];
+    if(!ultimo) return hoje > venc ? 'atrasado' : 'pendente';
+    const prox = new Date(new Date(ultimo.data + 'T00:00:00').setMonth(new Date(ultimo.data + 'T00:00:00').getMonth() + 1));
+    return hoje <= prox ? 'pago' : hoje > venc ? 'atrasado' : 'pendente';
 }
-
-function getStatusTexto(status) {
-    switch(status) {
+function statusTexto(s) {
+    switch(s){
         case 'pago': return '<span class="status-pago">✅ Em dia</span>';
         case 'pendente': return '<span class="status-pendente">⏳ Pendente</span>';
         case 'atrasado': return '<span class="status-atrasado">⚠️ Atrasado</span>';
     }
 }
 
+// === WHATSAPP / RECIBOS ===
+function enviarReciboMensal(aluno, valorPago, dataPg) {
+    const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
+    if(tel.length < 10) { alert('Telefone inválido!'); return; }
+    const saldo = calcularSaldoMensal(aluno);
+    const msg = `🧾 RECIBO MENSALIDADE
+Aluno: ${aluno.nome}
+Faixa: ${aluno.faixaAtual}
+Data: ${dataPg}
+Valor: R$ ${valorPago.toFixed(2).replace('.',',')}
+Mensalidade: R$ ${(aluno.valorMensalidade||0).toFixed(2).replace('.',',')}
+${saldo>0?`Saldo: R$ ${saldo.toFixed(2).replace('.',',')} ⚠️`:'✅ Tudo em dia!'}
+Obrigado! 🥋`;
+    window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+function enviarReciboExame(aluno, valorPago, dataPg) {
+    const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
+    if(tel.length < 10) { alert('Telefone inválido!'); return; }
+    const saldo = calcularSaldoExame(aluno);
+    const msg = `🎓 RECIBO TAXA DE EXAME
+Aluno: ${aluno.nome}
+Faixa: ${aluno.faixaAtual}
+Data: ${dataPg}
+Valor: R$ ${valorPago.toFixed(2).replace('.',',')}
+Taxa total: R$ ${(aluno.valorExameFaixa||0).toFixed(2).replace('.',',')}
+${aluno.dataPrevExame?'Exame: '+aluno.dataPrevExame.split('-').reverse().join('/')+'\n':''}
+${saldo>0?`Saldo: R$ ${saldo.toFixed(2).replace('.',',')} ⚠️`:'✅ Quitado! Pronto!'}
+Boa sorte! 🥋`;
+    window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// === REGISTRAR PAGAMENTOS ===
+function registrarMensal(id) {
+    const lista = carregarAlunos();
+    const aluno = lista.find(a => a.id === id);
+    if(!aluno) return;
+    const saldo = calcularSaldoMensal(aluno);
+    const valor = prompt(`Pagamento Mensal — ${aluno.nome}\nSaldo: R$ ${saldo.toFixed(2)}\nValor:`, saldo>0?saldo.toFixed(2):(aluno.valorMensalidade||0).toFixed(2));
+    if(!valor || valor.trim()==='') return;
+    const pago = parseFloat(valor.replace(',','.'));
+    if(isNaN(pago) || pago <= 0) { alert('Valor inválido!'); return; }
+    const dataPg = new Date().toISOString().split('T')[0];
+    if(!aluno.pagamentos) aluno.pagamentos = [];
+    aluno.pagamentos.push({data: dataPg, valor: pago});
+    salvarAlunos(lista);
+    const novoSaldo = calcularSaldoMensal(aluno);
+    if(confirm(`✅ Registrado!\nSaldo restante: R$ ${novoSaldo.toFixed(2)}\nEnviar recibo?`)) {
+        enviarReciboMensal(aluno, pago, dataPg.split('-').reverse().join('/'));
+    }
+    exibirLista(); exibirPagamentos();
+}
+function registrarExame(id) {
+    const lista = carregarAlunos();
+    const aluno = lista.find(a => a.id === id);
+    if(!aluno) return;
+    const saldo = calcularSaldoExame(aluno);
+    const valor = prompt(`Pagamento Exame — ${aluno.nome}\nSaldo: R$ ${saldo.toFixed(2)}\nValor:`, saldo>0?saldo.toFixed(2):(aluno.valorExameFaixa||0).toFixed(2));
+    if(!valor || valor.trim()==='') return;
+    const pago = parseFloat(valor.replace(',','.'));
+    if(isNaN(pago) || pago <= 0) { alert('Valor inválido!'); return; }
+    const dataPg = new Date().toISOString().split('T')[0];
+    if(!aluno.pagamentosExame) aluno.pagamentosExame = [];
+    aluno.pagamentosExame.push({data: dataPg, valor: pago});
+    salvarAlunos(lista);
+    const novoSaldo = calcularSaldoExame(aluno);
+    if(confirm(`✅ Registrado!\nSaldo restante: R$ ${novoSaldo.toFixed(2)}\nEnviar recibo?`)) {
+        enviarReciboExame(aluno, pago, dataPg.split('-').reverse().join('/'));
+    }
+    exibirLista(); exibirPagamentos();
+}
+
+// === DIPLOMA ===
 function gerarDiploma(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
-    const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
-    const nomeAcademia = cfg.nomeAcademia || 'Academia de Karatê';
-    const cidade = cfg.cidadeAcademia || '';
-    const instrutor = cfg.nomeInstrutor || 'Instrutor';
-    const assinatura2 = cfg.assinatura2 || '';
-    const dataExame = aluno.ultimoExame ? new Date(aluno.ultimoExame + 'T00:00:00') : new Date();
-    const dataFormatada = dataExame.toLocaleDateString('pt-BR', {day: '2-digit', month: 'long', year: 'numeric'});
-    const assinatura2HTML = assinatura2 ? `<div class="assinatura" style="text-align:center;"><br><br><strong>${assinatura2}</strong></div>` : '';
-    
+    const cfg = carregarConfig();
     document.getElementById('conteudoDiploma').innerHTML = `
         <div class="diploma-borda">
-            <div class="diploma-titulo">${nomeAcademia}</div>
-            <div class="diploma-subtitulo">${cidade}</div>
-            <h2 style="font-size:26px; color:#8b4513; margin-bottom:30px;">C E R T I F I C A D O</h2>
-            <div class="diploma-corpo">Certificamos que<br>
-                <div class="diploma-nome">${aluno.nome}</div>
-                foi aprovado(a) no exame de graduação, conquistando a faixa<br>
-                <div class="diploma-faixa">🥋 ${aluno.faixaAtual}</div>
-            </div>
-            <div class="diploma-data">Concedido em ${dataFormatada}</div>
+            <div class="diploma-titulo">${cfg.nomeAcademia||'Academia de Karatê'}</div>
+            <h2 style="font-size:26px; color:#8b4513; margin:30px 0;">CERTIFICADO DE PROMOÇÃO</h2>
+            <div style="font-size:18px;">Certificamos que</div>
+            <div class="diploma-nome">${aluno.nome}</div>
+            <div style="font-size:18px;">conquistou a faixa</div>
+            <div class="diploma-faixa">🥋 ${aluno.faixaAtual}</div>
+            ${aluno.ultimoExame?`<div style="font-size:16px; margin:20px 0;">Conquistado em ${new Date(aluno.ultimoExame+'T00:00:00').toLocaleDateString('pt-BR')}</div>`:''}
             <div class="diploma-assinaturas">
-                <div class="assinatura" style="text-align:center;"><br><br><strong>${instrutor}</strong><br>Instrutor(a)</div>
-                ${assinatura2HTML}
+                <div class="assinatura" style="text-align:center;"><br><br><strong>${cfg.nomeInstrutor||'Instrutor Responsável'}</strong></div>
+                ${cfg.assinatura2?`<div class="assinatura" style="text-align:center;"><br><br><strong>${cfg.assinatura2}</strong></div>`:''}
             </div>
         </div>`;
     document.getElementById('modalDiploma').classList.add('aberto');
-    document.body.style.overflow = 'hidden';
+}
+function fecharDiploma() { document.getElementById('modalDiploma').classList.remove('aberto'); }
+
+// === EXIBIR LISTA ===
+function exibirLista() {
+    const busca = document.getElementById('campoBusca').value.toLowerCase();
+    let lista = carregarAlunos();
+    if(busca) lista = lista.filter(a => a.nome.toLowerCase().includes(busca) || a.faixaAtual.toLowerCase().includes(busca));
+    document.getElementById('quantidade').innerHTML = `<strong>${lista.length}</strong> aluno(s)`;
+    const div = document.getElementById('listaAlunos');
+    div.innerHTML = '';
+    if(!lista.length) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
+    lista.forEach(aluno => {
+        const saldoMensal = calcularSaldoMensal(aluno);
+        const saldoExame = calcularSaldoExame(aluno);
+        const status = calcularStatus(aluno);
+        const item = document.createElement('div');
+        item.className = 'item-aluno';
+        item.innerHTML = `
+        <div class="cabecalho-aluno">
+            <div class="dados-principais">
+                <h3>${aluno.nome}</h3>
+                <p>Faixa: <span class="faixa-${aluno.faixaAtual.toLowerCase()}">${aluno.faixaAtual}</span></p>
+                <p>Mensalidade: R$ ${(aluno.valorMensalidade||0).toFixed(2).replace('.',',')}
+                ${saldoMensal>0?`<span class="saldo-devedor"> ⚠️ Saldo: R$ ${saldoMensal.toFixed(2).replace('.',',')}</span>`:' ✅ Em dia'}</p>
+                ${aluno.valorExameFaixa>0?`<p>Taxa Exame: R$ ${(aluno.valorExameFaixa||0).toFixed(2).replace('.',',')}
+                ${saldoExame>0?`<span class="saldo-exame"> ⚠️ Saldo: R$ ${saldoExame.toFixed(2).replace('.',',')}</span>`:' ✅ Quitado'}</p>`:''}
+                <p>Status: ${statusTexto(status)}</p>
+            </div>
+            <div class="botoes-acao" data-id="${aluno.id}">
+                ${saldoMensal>0||saldoExame>0||status==='atrasado'?`<button class="btn-vermelho aviso-btn">⚠️ Aviso</button>`:''}
+                <button class="btn-verde mensal-btn">💳 Mensalidade</button>
+                ${aluno.valorExameFaixa>0?`<button class="btn-laranja exame-btn">🎓 Exame</button>`:''}
+                <button class="btn-roxo diploma-btn">🖨️ Diploma</button>
+                <button class="btn-amarelo editar-btn">✏️ Editar</button>
+                <button class="btn-vermelho excluir-btn">🗑️ Excluir</button>
+            </div>
+        </div>`;
+        div.appendChild(item);
+        
+        // VINCULAÇÃO DOS BOTÕES — 100% CORRIGIDA
+        const id = aluno.id;
+        item.querySelector('.mensal-btn').onclick = () => registrarMensal(id);
+        if(item.querySelector('.exame-btn')) item.querySelector('.exame-btn').onclick = () => registrarExame(id);
+        item.querySelector('.diploma-btn').onclick = () => gerarDiploma(id);
+        if(item.querySelector('.aviso-btn')) item.querySelector('.aviso-btn').onclick = () => enviarAviso(id);
+        item.querySelector('.editar-btn').onclick = () => editarAluno(id);
+        item.querySelector('.excluir-btn').onclick = () => { if(confirm('Excluir '+aluno.nome+'?')) excluirAluno(id); };
+    });
 }
 
-function fecharDiploma() {
-    document.getElementById('modalDiploma').classList.remove('aberto');
-    document.body.style.overflow = 'auto';
+// === EXIBIR PAGAMENTOS ===
+function exibirPagamentos() {
+    const filtro = document.getElementById('filtroPagamento').value;
+    let lista = carregarAlunos().map(a => ({
+        ...a,
+        saldoMensal: calcularSaldoMensal(a),
+        saldoExame: calcularSaldoExame(a),
+        statusPagamento: calcularStatus(a)
+    }));
+    let totalPagos=0, totalPend=0, totalAtr=0, saldoGeralMensal=0, saldoGeralExame=0;
+    lista.forEach(a => {
+        saldoGeralMensal += a.saldoMensal;
+        saldoGeralExame += a.saldoExame;
+        if(a.statusPagamento==='pago') totalPagos++;
+        else if(a.statusPagamento==='pendente') totalPend++;
+        else totalAtr++;
+    });
+    if(filtro==='comSaldo') lista = lista.filter(a => a.saldoMensal>0);
+    else if(filtro==='comSaldoExame') lista = lista.filter(a => a.saldoExame>0);
+    else if(filtro!=='todos') lista = lista.filter(a => a.statusPagamento===filtro);
+    
+    document.getElementById('totalAlunos').textContent = lista.length;
+    document.getElementById('totalPagos').textContent = totalPagos;
+    document.getElementById('totalPendentes').textContent = totalPend;
+    document.getElementById('totalAtrasados').textContent = totalAtr;
+    document.getElementById('saldoTotal').textContent = `R$ ${saldoGeralMensal.toFixed(2).replace('.',',')}`;
+    document.getElementById('saldoExameTotal').textContent = `R$ ${saldoGeralExame.toFixed(2).replace('.',',')}`;
+    
+    const div = document.getElementById('listaPagamentos');
+    div.innerHTML = '';
+    if(!lista.length) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
+    lista.forEach(aluno => {
+        const item = document.createElement('div');
+        item.className = 'item-aluno';
+        item.innerHTML = `
+        <div class="linha" style="align-items:flex-start;">
+            <div class="col" style="flex:2;">
+                <h4>${aluno.nome}</h4>
+                <p>Faixa: ${aluno.faixaAtual}</p>
+                <p>Mensalidade: R$ ${(aluno.valorMensalidade||0).toFixed(2).replace('.',',')}
+                ${aluno.saldoMensal>0?`<span class="saldo-devedor"> ⚠️ Saldo: R$ ${aluno.saldoMensal.toFixed(2).replace('.',',')}</span>`:' ✅ Em dia'}</p>
+                ${aluno.valorExameFaixa>0?`<p>Taxa Exame: R$ ${(aluno.valorExameFaixa||0).toFixed(2).replace('.',',')}
+                ${aluno.saldoExame>0?`<span class="saldo-exame"> ⚠️ Saldo: R$ ${aluno.saldoExame.toFixed(2).replace('.',',')}</span>`:' ✅ Quitado'}</p>`:''}
+            </div>
+            <div class="col" style="flex:1;">
+                <p>Status: ${statusTexto(aluno.statusPagamento)}</p>
+                <p>Vencimento: dia ${aluno.diaVencimento||1}</p>
+            </div>
+            <div class="col" style="flex:1;" data-id="${aluno.id}">
+                ${aluno.saldoMensal>0||aluno.saldoExame>0||aluno.statusPagamento==='atrasado'?`<button class="btn-vermelho aviso-btn" style="padding:6px; margin-bottom:5px;">⚠️ Aviso</button>`:''}
+                <button class="btn-verde mensal-btn" style="padding:6px; margin-bottom:5px;">💳 Mensalidade</button>
+                ${aluno.valorExameFaixa>0?`<button class="btn-laranja exame-btn" style="padding:6px;">🎓 Exame</button>`:''}
+            </div>
+        </div>`;
+        div.appendChild(item);
+        
+        const id = aluno.id;
+        item.querySelector('.mensal-btn').onclick = () => registrarMensal(id);
+        if(item.querySelector('.exame-btn')) item.querySelector('.exame-btn').onclick = () => registrarExame(id);
+        if(item.querySelector('.aviso-btn')) item.querySelector('.aviso-btn').onclick = () => enviarAviso(id);
+    });
 }
 
-function enviarAvisoAtraso(id) {
+// === DEMAIS FUNÇÕES ===
+function enviarAviso(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
-    if(calcularStatus(aluno) !== 'atrasado') { alert('✅ Não está em atraso!'); return; }
     const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
-    if(tel.length < 10) { alert('⚠️ Telefone inválido!'); return; }
-    const valor = (aluno.valorMensalidade || 0).toFixed(2);
-    const nomeResp = aluno.nomeResponsavel || 'Responsável';
-    const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
-    const nomeAcad = cfg.nomeAcademia || 'Academia de Karatê';
-    const mensagem = `⚠️ AVISO DE ATRASO\nOlá, ${nomeResp}! Somos da ${nomeAcad}. A mensalidade de ${aluno.nome} está atrasada: R$ ${valor}. Por favor regularize. Obrigado! 🙏🥋`;
-    window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
+    if(tel.length < 10) { alert('Telefone inválido!'); return; }
+    const saldoMensal = calcularSaldoMensal(aluno);
+    const saldoExame = calcularSaldoExame(aluno);
+    let msg = `⚠️ AVISO DE PENDÊNCIA
+Aluno: ${aluno.nome}
+${saldoMensal>0?`Mensalidade pendente: R$ ${saldoMensal.toFixed(2).replace('.',',')}`:''}
+${saldoExame>0?`Taxa exame pendente: R$ ${saldoExame.toFixed(2).replace('.',',')}`:''}
+Regularize, por favor. Obrigado! 🥋`;
+    window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
 }
-
-function enviarWhatsApp(id) {
-    const aluno = carregarAlunos().find(a => a.id === id);
-    if(!aluno || !aluno.telefoneResponsavel) { alert('⚠️ Telefone não cadastrado!'); return; }
-    const mensagem = `🥋 FICHA — ${aluno.nome}\nResp: ${aluno.nomeResponsavel || '-'}\nTel: ${aluno.telefoneResponsavel}\nNasc: ${aluno.nascimento} — ${aluno.idade}\nFaixa: ${aluno.faixaAtual}\nMensalidade: R$ ${(aluno.valorMensalidade||0).toFixed(2)}`;
-    const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
-    window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
-}
-
 function editarAluno(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
@@ -533,247 +492,162 @@ function editarAluno(id) {
     document.getElementById('telefoneResponsavel').value = aluno.telefoneResponsavel || '';
     document.getElementById('telefoneAluno').value = aluno.telefoneAluno || '';
     document.getElementById('email').value = aluno.email || '';
-    fotoBase64 = aluno.foto || '';
-    document.getElementById('caixaFoto').innerHTML = fotoBase64 ? `<img src="${fotoBase64}">` : '📷 Sem foto';
     document.getElementById('matricula').value = aluno.matricula || '';
     document.getElementById('faixaAtual').value = aluno.faixaAtual || 'Branca';
     document.getElementById('ultimoExame').value = aluno.ultimoExame || '';
     document.getElementById('valorMensalidade').value = aluno.valorMensalidade || '';
     document.getElementById('diaVencimento').value = aluno.diaVencimento || '';
+    document.getElementById('valorExameFaixa').value = aluno.valorExameFaixa || '';
+    document.getElementById('dataPrevExame').value = aluno.dataPrevExame || '';
     document.getElementById('areaHistorico').innerHTML = '';
-    if(aluno.historico && aluno.historico.length>0) aluno.historico.forEach(h => adicionarLinhaHist(h.data, h.faixa));
+    (aluno.historico || []).forEach(h => adicionarLinhaHist(h.data, h.faixa));
 }
-
-function excluirAluno(id) {
-    if(!confirm('Confirma exclusão?')) return;
-    salvarAlunos(carregarAlunos().filter(a => a.id !== id));
-    exibirLista();
+function excluirAluno(id) { salvarAlunos(carregarAlunos().filter(a => a.id !== id)); exibirLista(); }
+function calcularIdade() {
+    const nasc = document.getElementById('nascimento').value;
+    if(!nasc) return;
+    const hoje = new Date(), n = new Date(nasc+'T00:00:00');
+    let idade = hoje.getFullYear() - n.getFullYear();
+    const m = hoje.getMonth() - n.getMonth();
+    if(m < 0 || (m === 0 && hoje.getDate() < n.getDate())) idade--;
+    document.getElementById('idade').value = idade+' anos';
 }
-
-function registrarPagamento(id) {
-    const lista = carregarAlunos();
-    const aluno = lista.find(a => a.id === id);
-    if(!aluno) return;
-    const valor = prompt(`Valor para ${aluno.nome}?\nSugerido: R$ ${(aluno.valorMensalidade||0).toFixed(2)}`);
-    if(valor===null) return;
-    const valorFinal = parseFloat(valor.replace(',','.')) || aluno.valorMensalidade || 0;
-    const data = new Date().toISOString().split('T')[0];
-    if(!aluno.pagamentos) aluno.pagamentos = [];
-    aluno.pagamentos.push({data, valor: valorFinal, status:'pago'});
-    salvarAlunos(lista);
-    alert(`✅ Pgto registrado!\nValor: R$ ${valorFinal.toFixed(2)}`);
-    exibirPagamentos();
+function adicionarLinhaHist(data='', faixa='') {
+    const area = document.getElementById('areaHistorico');
+    const div = document.createElement('div');
+    div.className = 'entrada-hist';
+    div.innerHTML = `
+        <input type="date" class="dataExame" value="${data}">
+        <select class="faixaConquistada">
+            <option value="">Selecione</option>
+            ${['Branca','Amarela','Vermelha','Laranja','Verde','Roxa','Marrom','Preta'].map(f=>`<option ${faixa===f?'selected':''}>${f}</option>`).join('')}
+        </select>
+        <button type="button" class="btn-vermelho" style="width:auto; padding:6px 10px;">✕</button>
+    `;
+    div.querySelector('.btn-vermelho').onclick = () => div.remove();
+    area.appendChild(div);
 }
-
-function gerarFichaPDF(id) {
-    if(!verificarPdfMake()) return;
-    const aluno = carregarAlunos().find(a => a.id === id);
-    if(!aluno) return;
-    const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
-    const hist = aluno.historico?.length ? aluno.historico.map(h => `${h.data} — ${h.faixa}`).join('\n') : 'Sem registros';
-    const doc = {
-        pageSize:'A4',
-        content: [
-            {text: cfg.nomeAcademia || 'Academia de Karatê', fontSize:20, bold:true, alignment:'center', margin:[0,0,0,5]},
-            {text:'FICHA CADASTRAL', fontSize:16, bold:true, alignment:'center', margin:[0,0,0,20]},
-            {text:'📋 Dados Pessoais', bold:true, fontSize:14, margin:[0,10,0,5]},
-            {table:{widths:['30%','70%'], body:[
-                ['Nome:', aluno.nome],
-                ['Responsável:', aluno.nomeResponsavel||'—'],
-                ['Tel.:', aluno.telefoneResponsavel],
-                ['Nascimento:', `${aluno.nascimento} (${aluno.idade})`]
-            ]}, margin:[0,0,0,15]},
-            {text:'🥋 Academia', bold:true, fontSize:14, margin:[0,10,0,5]},
-            {table:{widths:['30%','70%'], body:[
-                ['Faixa:', aluno.faixaAtual],
-                ['Mensalidade:', `R$ ${(aluno.valorMensalidade||0).toFixed(2).replace('.',',')}`]
-            ]}, margin:[0,0,0,15]},
-            {text:'📜 Histórico', bold:true, fontSize:14, margin:[0,10,0,5]},
-            {text:hist}
-        ],
-        defaultStyle:{fontSize:11}
+function fazerBackup() {
+    const dados = {data: new Date().toLocaleString('pt-BR'), alunos: carregarAlunos(), config: carregarConfig()};
+    const blob = new Blob([JSON.stringify(dados,null,2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `backup-karate-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.json`;
+    a.click(); URL.revokeObjectURL(url); alert('✅ Baixado!');
+}
+function restaurarBackup(arq) {
+    if(!confirm('⚠️ Substituir dados atuais?')) return;
+    const leitor = new FileReader();
+    leitor.onload = e => {
+        try {
+            const d = JSON.parse(e.target.result);
+            if(!d.alunos) throw 'Inválido';
+            salvarAlunos(d.alunos);
+            if(d.config) localStorage.setItem('configAcademia', JSON.stringify(d.config));
+            alert(`✅ Restaurado! ${d.alunos.length} alunos.`);
+        } catch(err) { alert('Erro: '+err); }
     };
-    pdfmake.createPdf(doc).download(`ficha_${aluno.nome.replaceAll(' ','_')}.pdf`);
+    leitor.readAsText(arq);
 }
-
 function exportarExcel() {
     const lista = carregarAlunos();
     if(!lista.length) { alert('Sem dados!'); return; }
-    const cab = ['Nome','Resp','Tel Resp','Nasc','Faixa','Valor','Vencimento','Status'];
-    const linhas = lista.map(a => [
-        a.nome, a.nomeResponsavel||'', a.telefoneResponsavel, a.nascimento, a.faixaAtual,
-        (a.valorMensalidade||0).toFixed(2).replace('.',','), a.diaVencimento||1, calcularStatus(a)
-    ]);
-    let csv = cab.join(';')+'\n';
-    linhas.forEach(l => csv += l.join(';')+'\n');
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    let csv = 'Nome;Faixa;Mensalidade;SaldoMensal;TaxaExame;SaldoExame;TelefoneResp\n';
+    lista.forEach(a => {
+        csv += `${a.nome};${a.faixaAtual};${(a.valorMensalidade||0).toFixed(2).replace('.',',')};${calcularSaldoMensal(a).toFixed(2).replace('.',',')};${(a.valorExameFaixa||0).toFixed(2).replace('.',',')};${calcularSaldoExame(a).toFixed(2).replace('.',',')};${a.telefoneResponsavel}\n`;
+    });
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `alunos-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    alert('✅ Exportado! Abra no Excel.');
+    a.href = url; a.download = `alunos-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
+    a.click(); URL.revokeObjectURL(url);
 }
 
-function exibirLista() {
-    const busca = document.getElementById('campoBusca').value.toLowerCase();
-    let lista = carregarAlunos();
-    if(busca) lista = lista.filter(a => a.nome.toLowerCase().includes(busca) || a.faixaAtual.toLowerCase().includes(busca));
-    document.getElementById('quantidade').innerHTML = `<strong>${lista.length}</strong> aluno(s)`;
-    const div = document.getElementById('listaAlunos');
-    div.innerHTML = '';
-    if(lista.length === 0) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno cadastrado.</p>'; return; }
-    lista.forEach(aluno => {
-        const status = calcularStatus(aluno);
-        const item = document.createElement('div');
-        item.className = 'item-aluno';
-        item.innerHTML = `
-        <div class="cabecalho-aluno">
-            <div class="foto-preview" style="width:100px; height:120px;">${aluno.foto ? `<img src="${aluno.foto}">` : '📷'}</div>
-            <div class="dados-principais">
-                <h3>${aluno.nome}</h3>
-                <p>👤 Resp: ${aluno.nomeResponsavel || '-'}</p>
-                <p>📞 Resp: ${aluno.telefoneResponsavel}</p>
-                <p>Faixa: <span class="faixa-${aluno.faixaAtual.toLowerCase()}">${aluno.faixaAtual}</span></p>
-                <p>Pagamento: ${getStatusTexto(status)}</p>
-            </div>
-            <div class="botoes-acao" data-id="${aluno.id}">
-                ${status==='atrasado'?`<button class="btn-vermelho acao-aviso">⚠️ Aviso</button>`:''}
-                <button class="btn-roxo acao-diploma">🖨️ Diploma</button>
-                <button class="btn-amarelo acao-editar">✏️ Editar</button>
-                <button class="btn-azul-claro acao-pdf">📄 PDF</button>
-                <button class="btn-whats acao-whats">💬 WhatsApp</button>
-                <button class="btn-vermelho acao-excluir">🗑️ Excluir</button>
-            </div>
-        </div>`;
-        div.appendChild(item);
-        const botoes = item.querySelector('.botoes-acao');
-        const id = aluno.id;
-        botoes.querySelector('.acao-diploma').addEventListener('click', () => gerarDiploma(id));
-        botoes.querySelector('.acao-editar').addEventListener('click', () => editarAluno(id));
-        botoes.querySelector('.acao-pdf').addEventListener('click', () => gerarFichaPDF(id));
-        botoes.querySelector('.acao-whats').addEventListener('click', () => enviarWhatsApp(id));
-        botoes.querySelector('.acao-excluir').addEventListener('click', () => { if(confirm('Excluir '+aluno.nome+'?')) excluirAluno(id); });
-        if(status==='atrasado') botoes.querySelector('.acao-aviso').addEventListener('click', () => enviarAvisoAtraso(id));
-    });
-}
-
-function exibirPagamentos() {
-    const filtro = document.getElementById('filtroPagamento').value;
-    let lista = carregarAlunos();
-    let totalPagos=0, totalPendentes=0, totalAtrasados=0;
-    lista = lista.map(a => {
-        a.statusPagamento = calcularStatus(a);
-        if(a.statusPagamento==='pago') totalPagos++;
-        else if(a.statusPagamento==='pendente') totalPendentes++;
-        else totalAtrasados++;
-        return a;
-    });
-    document.getElementById('totalAlunos').textContent = lista.length;
-    document.getElementById('totalPagos').textContent = totalPagos;
-    document.getElementById('totalPendentes').textContent = totalPendentes;
-    document.getElementById('totalAtrasados').textContent = totalAtrasados;
-    if(filtro!=='todos') lista = lista.filter(a => a.statusPagamento === filtro);
-    const div = document.getElementById('listaPagamentos');
-    div.innerHTML = '';
-    if(lista.length===0) { div.innerHTML='<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
-    lista.forEach(aluno => {
-        const item = document.createElement('div');
-        item.className = 'item-aluno';
-        item.innerHTML = `
-        <div class="linha" style="align-items:center;">
-            <div class="col" style="flex:2;"><h4>${aluno.nome}</h4><p>Faixa: ${aluno.faixaAtual}</p></div>
-            <div class="col" style="flex:1;"><p>R$ ${(aluno.valorMensalidade||0).toFixed(2)}</p><p>Dia ${aluno.diaVencimento}</p></div>
-            <div class="col" style="flex:1;">${getStatusTexto(aluno.statusPagamento)}</div>
-            <div class="col" style="flex:1;" data-id="${aluno.id}">
-                ${aluno.statusPagamento==='atrasado'?`<button class="btn-vermelho" style="padding:6px;">⚠️ Aviso</button>`:''}
-                <button class="btn-verde" style="padding:6px; margin-left:5px;">Registrar</button>
-            </div>
-        </div>`;
-        div.appendChild(item);
-        const acoes = item.querySelector('[data-id]');
-        const id = aluno.id;
-        const botoes = acoes.querySelectorAll('button');
-        if(botoes.length === 2) {
-            botoes[0].addEventListener('click', () => enviarAvisoAtraso(id));
-            botoes[1].addEventListener('click', () => registrarPagamento(id));
-        } else if(botoes.length === 1) {
-            botoes[0].addEventListener('click', () => registrarPagamento(id));
-        }
-    });
-}
-
+// === INICIALIZAÇÃO ===
 document.addEventListener('DOMContentLoaded', () => {
-    carregarConfiguracoes();
-    
-    document.getElementById('nascimento').addEventListener('change', calcularIdade);
-    document.getElementById('foto').addEventListener('change', (e) => previewFoto(e.target.files[0]));
-    
-    document.getElementById('formAluno').addEventListener('submit', e => {
+    // Abas
+    document.querySelectorAll('.aba').forEach(aba => {
+        aba.onclick = () => {
+            document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
+            document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
+            aba.classList.add('ativa');
+            const alvo = aba.getAttribute('data-alvo');
+            document.getElementById(alvo).classList.add('visivel');
+            if(alvo === 'lista') exibirLista();
+            if(alvo === 'pagamentos') exibirPagamentos();
+        };
+    });
+
+    // Config
+    carregarConfig();
+    document.getElementById('btnSalvarConfig').onclick = salvarConfig;
+
+    // Formulário
+    document.getElementById('nascimento').onchange = calcularIdade;
+    document.getElementById('formAluno').onsubmit = e => {
         e.preventDefault();
         const nome = document.getElementById('nome').value.trim();
-        const nascimento = document.getElementById('nascimento').value;
-        const telResp = document.getElementById('telefoneResponsavel').value.trim().replace(/\D/g,'');
-        if(!nome) { alert('⚠️ Preencha o nome!'); return; }
-        if(!nascimento) { alert('⚠️ Preencha a data de nascimento!'); return; }
-        if(telResp.length < 10) { alert('⚠️ Telefone incompleto!'); return; }
-        
+        const nasc = document.getElementById('nascimento').value;
+        const tel = document.getElementById('telefoneResponsavel').value.replace(/\D/g,'');
+        if(!nome) { alert('Nome!'); return; }
+        if(!nasc) { alert('Nascimento!'); return; }
+        if(tel.length < 10) { alert('Telefone incompleto!'); return; }
+
         const lista = carregarAlunos();
         const id = document.getElementById('idAluno').value || Date.now();
         const historico = [];
         document.querySelectorAll('.entrada-hist').forEach(linha => {
             const d = linha.querySelector('.dataExame').value;
             const f = linha.querySelector('.faixaConquistada').value;
-            if(d && f) historico.push({data: d, faixa: f});
+            if(d && f) historico.push({data:d, faixa:f});
         });
+
         const dados = {
             id, nome,
             nomeResponsavel: document.getElementById('nomeResponsavel').value.trim(),
-            nascimento,
+            nascimento: nasc,
             idade: document.getElementById('idade').value,
             endereco: document.getElementById('endereco').value.trim(),
             telefoneResponsavel: document.getElementById('telefoneResponsavel').value.trim(),
             telefoneAluno: document.getElementById('telefoneAluno').value.trim(),
             email: document.getElementById('email').value.trim(),
-            foto: fotoBase64,
             matricula: document.getElementById('matricula').value,
             faixaAtual: document.getElementById('faixaAtual').value,
             ultimoExame: document.getElementById('ultimoExame').value || null,
             valorMensalidade: parseFloat(document.getElementById('valorMensalidade').value) || 0,
             diaVencimento: parseInt(document.getElementById('diaVencimento').value) || 1,
+            valorExameFaixa: parseFloat(document.getElementById('valorExameFaixa').value) || 0,
+            dataPrevExame: document.getElementById('dataPrevExame').value || null,
             historico,
-            pagamentos: []
+            pagamentos: [],
+            pagamentosExame: []
         };
-        const indice = lista.findIndex(a => a.id == id);
-        if(indice >= 0) {
-            dados.pagamentos = lista[indice].pagamentos || [];
-            lista[indice] = dados;
-            alert(`✅ Atualizado: ${dados.nome}`);
+
+        const ind = lista.findIndex(a => a.id == id);
+        if(ind >= 0) {
+            dados.pagamentos = lista[ind].pagamentos || [];
+            dados.pagamentosExame = lista[ind].pagamentosExame || [];
+            lista[ind] = dados;
+            alert('✅ Atualizado: '+dados.nome);
         } else {
             lista.push(dados);
-            alert(`✅ Cadastrado: ${dados.nome}`);
+            alert('✅ Cadastrado: '+dados.nome);
         }
         salvarAlunos(lista);
         document.querySelector('[data-alvo="lista"]').click();
-    });
+    };
 
-    document.getElementById('btnSalvarConfig').addEventListener('click', salvarConfiguracoes);
-    document.getElementById('btnBackup').addEventListener('click', fazerBackup);
-    document.getElementById('arquivoBackup').addEventListener('change', (e) => restaurarBackup(e.target.files[0]));
-    document.getElementById('btnAddHist').addEventListener('click', () => adicionarLinhaHist());
-    document.getElementById('btnCancelarEdicao').addEventListener('click', () => document.querySelector('[data-alvo="lista"]').click());
-    document.getElementById('campoBusca').addEventListener('input', exibirLista);
-    document.getElementById('btnExportar').addEventListener('click', exportarExcel);
-    document.getElementById('filtroPagamento').addEventListener('change', exibirPagamentos);
-    document.getElementById('btnImprimir').addEventListener('click', () => window.print());
-    document.getElementById('btnFecharDiploma').addEventListener('click', fecharDiploma);
-    document.getElementById('modalDiploma').addEventListener('click', (e) => {
-        if(e.target.id
-        === 'modalDiploma') fecharDiploma();
-    });
+    // Outros botões
+    document.getElementById('btnAddHist').onclick = () => adicionarLinhaHist();
+    document.getElementById('btnCancelarEdicao').onclick = () => document.querySelector('[data-alvo="lista"]').click();
+    document.getElementById('campoBusca').oninput = exibirLista;
+    document.getElementById('btnExportar').onclick = exportarExcel;
+    document.getElementById('filtroPagamento').onchange = exibirPagamentos;
+    document.getElementById('btnBackup').onclick = fazerBackup;
+    document.getElementById('arquivoBackup').onchange = e => restaurarBackup(e.target.files[0]);
+    document.getElementById('btnFecharDiploma').onclick = fecharDiploma;
+    document.getElementById('modalDiploma').onclick = e => { if(e.target.id==='modalDiploma') fecharDiploma(); };
+    document.getElementById('btnImprimir').onclick = () => window.print();
 });
 </script>
 </body>
