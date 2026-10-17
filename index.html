@@ -3,12 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Cadastro de Alunos — Karatê</title>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif; }
-        body { background: #f0f4f8; padding: 15px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif !important; }
+        html { font-size: 16px; }
+        body { 
+            background: #f0f4f8 !important; 
+            padding: 15px !important; 
+            font-family: sans-serif !important;
+            display: block !important;
+        }
         .container { max-width: 1000px; margin: 0 auto; }
         h1 { text-align: center; color: #b91c1c; margin-bottom: 25px; }
         .abas { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
@@ -18,7 +25,7 @@
         .conteudo-aba.visivel { display: block; }
         .grupo { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-        input, select, button, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        input, select, button, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; font-family: sans-serif; }
         button { background: #2563eb; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 5px; }
         button:hover { opacity: 0.9; }
         .btn-vermelho { background: #dc2626; }
@@ -38,7 +45,6 @@
         .entrada-hist { display: flex; gap: 10px; margin: 8px 0; align-items: center; flex-wrap: wrap; }
         .busca { margin-bottom: 15px; }
         .oculto { display: none !important; }
-        
         .faixa-branca {background:#ffffff; border:1px solid #ddd;}
         .faixa-amarela {background:#fef08a;}
         .faixa-vermelha {background:#fca5a5;}
@@ -47,13 +53,11 @@
         .faixa-roxa {background:#ddd6fe;}
         .faixa-marrom {background:#d6b89c;}
         .faixa-preta {background:#1f2937; color:white;}
-        
         .status-pago { background: #bbf7d0; color: #065f46; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         .status-pendente { background: #fef08a; color: #854d0e; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         .status-atrasado { background: #fecaca; color: #991b1b; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
         .resumo { background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .botoes-acao { display: flex; flex-direction: column; gap: 5px; min-width: 130px; }
-        
         .modal-diploma { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow: auto; }
         .modal-diploma.aberto { display: flex; }
         .diploma-container { background: white; width: 210mm; min-height: 297mm; padding: 15mm; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.3); }
@@ -69,7 +73,7 @@
         .assinatura { border-top: 1px solid #333; width: 200px; padding-top: 10px; }
         .botoes-impressao { position: sticky; top: 10px; text-align: center; margin-bottom: 15px; z-index: 1001; }
         .botoes-impressao button { margin: 0 10px; padding: 12px 30px; font-size: 16px; }
-        
+        .aviso-sistema { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 15px; margin-bottom: 20px; border-radius: 4px; }
         @media print {
             .botoes-impressao, .botoes-acao, .abas, .container > h1 { display: none !important; }
             .modal-diploma { position: static; background: white; display: block !important; }
@@ -80,6 +84,8 @@
 </head>
 <body>
 <div class="container">
+    <div id="avisoSistema" class="aviso-sistema oculto"></div>
+    
     <h1>🥋 Cadastro de Alunos — Karatê</h1>
     <div class="abas">
         <button class="aba ativa" data-alvo="cadastro">Novo Aluno</button>
@@ -107,19 +113,20 @@
             <label>Assinatura (2ª pessoa)</label>
             <input type="text" id="assinatura2" placeholder="Opcional">
         </div>
-        <button class="btn-verde" onclick="salvarConfiguracoes()">💾 Salvar Configurações</button>
+        <button id="btnSalvarConfig" class="btn-verde">💾 Salvar Configurações</button>
     </div>
 
     <div id="backup" class="conteudo-aba">
         <h2>💾 Backup e Restauração</h2>
         <div class="grupo">
             <h3>📥 Fazer Backup</h3>
-            <button class="btn-verde" onclick="fazerBackup()">⬇️ Baixar Arquivo de Backup</button>
+            <p style="margin-bottom:10px;">Baixe e guarde em local seguro!</p>
+            <button id="btnBackup" class="btn-verde">⬇️ Baixar Arquivo de Backup</button>
         </div>
         <div class="grupo" style="margin-top:30px; padding-top:20px; border-top:1px solid #ddd;">
             <h3>📤 Restaurar Backup</h3>
-            <p style="color:red;">⚠️ Isso substitui os dados atuais!</p>
-            <input type="file" id="arquivoBackup" accept=".json" onchange="restaurarBackup(event)">
+            <p style="color:red; margin-bottom:10px;">⚠️ Substitui os dados atuais!</p>
+            <input type="file" id="arquivoBackup" accept=".json">
         </div>
     </div>
 
@@ -135,7 +142,7 @@
                 </div>
                 <div class="col grupo">
                     <label>Data de Nascimento *</label>
-                    <input type="date" id="nascimento" required onchange="calcularIdade()">
+                    <input type="date" id="nascimento" required>
                 </div>
                 <div class="col grupo">
                     <label>Idade</label>
@@ -168,7 +175,7 @@
             </div>
             <div class="grupo">
                 <label>Foto</label>
-                <input type="file" id="foto" accept="image/*" onchange="previewFoto(event)">
+                <input type="file" id="foto" accept="image/*">
                 <div class="foto-preview" id="caixaFoto">📷 Sem foto</div>
             </div>
             <h3 style="margin-top:25px;">🥋 Dados da Academia</h3>
@@ -208,9 +215,9 @@
             </div>
             <h4>📜 Histórico de Promoções</h4>
             <div id="areaHistorico"></div>
-            <button type="button" class="btn-amarelo" onclick="adicionarLinhaHist()">+ Adicionar Promoção</button>
+            <button type="button" id="btnAddHist" class="btn-amarelo">+ Adicionar Promoção</button>
             <button type="submit" class="btn-verde" style="margin-top:20px;">💾 Salvar Aluno</button>
-            <button type="button" class="oculto" id="btnCancelarEdicao" onclick="cancelarEdicao()">Cancelar Edição</button>
+            <button type="button" class="oculto" id="btnCancelarEdicao">Cancelar Edição</button>
         </form>
     </div>
 
@@ -219,10 +226,10 @@
         <div class="linha">
             <div class="col busca">
                 <label>🔍 Buscar:</label>
-                <input type="text" id="campoBusca" placeholder="Nome ou faixa..." oninput="exibirLista()">
+                <input type="text" id="campoBusca" placeholder="Nome ou faixa...">
             </div>
             <div class="col" style="display:flex; gap:8px; align-items:flex-end;">
-                <button class="btn-azul-claro" onclick="exportarExcel()">📊 Exportar Excel</button>
+                <button id="btnExportar" class="btn-azul-claro">📊 Exportar Excel</button>
             </div>
         </div>
         <div id="quantidade"></div>
@@ -241,7 +248,7 @@
         </div>
         <div class="busca">
             <label>Filtrar:</label>
-            <select id="filtroPagamento" onchange="exibirPagamentos()">
+            <select id="filtroPagamento">
                 <option value="todos">Todos</option>
                 <option value="pago">Em dia</option>
                 <option value="pendente">Pendentes</option>
@@ -252,20 +259,49 @@
     </div>
 </div>
 
-<div id="modalDiploma" class="modal-diploma" onclick="fecharDiplomaClique(event)">
+<div id="modalDiploma" class="modal-diploma">
     <div>
         <div class="botoes-impressao">
-            <button class="btn-verde" onclick="window.print()">🖨️ Imprimir</button>
-            <button class="btn-vermelho" onclick="fecharDiploma()">✕ Fechar</button>
+            <button class="btn-verde" id="btnImprimir">🖨️ Imprimir</button>
+            <button class="btn-vermelho" id="btnFecharDiploma">✕ Fechar</button>
         </div>
         <div class="diploma-container" id="conteudoDiploma"></div>
     </div>
 </div>
 
 <script>
+const avisoEl = document.getElementById('avisoSistema');
+function mostrarAviso(texto, tipo='info') {
+    avisoEl.textContent = texto;
+    avisoEl.classList.remove('oculto');
+    avisoEl.style.background = tipo === 'erro' ? '#fee2e2' : tipo === 'ok' ? '#d1fae5' : '#fef3c7';
+    avisoEl.style.borderColor = tipo === 'erro' ? '#ef4444' : tipo === 'ok' ? '#10b981' : '#f59e0b';
+    setTimeout(() => avisoEl.classList.add('oculto'), 5000);
+}
+
+function verificarPdfMake() {
+    if(typeof pdfmake !== 'undefined' && pdfmake !== null) return true;
+    mostrarAviso('⚠️ Biblioteca de PDF não carregada.', 'erro');
+    return false;
+}
+
+function verificarStorage() {
+    try {
+        const testeChave = '__teste_karoate__';
+        localStorage.setItem(testeChave, 'ok');
+        localStorage.removeItem(testeChave);
+        return true;
+    } catch(e) {
+        mostrarAviso('⚠️ Armazenamento bloqueado. Não use modo anônimo!', 'erro');
+        return false;
+    }
+}
+
+const storageOk = verificarStorage();
 let fotoBase64 = '';
 
 function salvarConfiguracoes() {
+    if(!storageOk) return;
     const config = {
         nomeAcademia: document.getElementById('nomeAcademia').value.trim(),
         cidadeAcademia: document.getElementById('cidadeAcademia').value.trim(),
@@ -277,13 +313,27 @@ function salvarConfiguracoes() {
 }
 
 function carregarConfiguracoes() {
-    const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
-    if(cfg.nomeAcademia) document.getElementById('nomeAcademia').value = cfg.nomeAcademia;
-    if(cfg.cidadeAcademia) document.getElementById('cidadeAcademia').value = cfg.cidadeAcademia;
-    if(cfg.nomeInstrutor) document.getElementById('nomeInstrutor').value = cfg.nomeInstrutor;
-    if(cfg.assinatura2) document.getElementById('assinatura2').value = cfg.assinatura2;
+    if(!storageOk) return {};
+    try {
+        const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
+        if(cfg.nomeAcademia) document.getElementById('nomeAcademia').value = cfg.nomeAcademia;
+        if(cfg.cidadeAcademia) document.getElementById('cidadeAcademia').value = cfg.cidadeAcademia;
+        if(cfg.nomeInstrutor) document.getElementById('nomeInstrutor').value = cfg.nomeInstrutor;
+        if(cfg.assinatura2) document.getElementById('assinatura2').value = cfg.assinatura2;
+        return cfg;
+    } catch { return {}; }
 }
-carregarConfiguracoes();
+
+function carregarAlunos() {
+    if(!storageOk) return [];
+    try { return JSON.parse(localStorage.getItem('alunosKaratêCompleto') || '[]'); }
+    catch { return []; }
+}
+
+function salvarAlunos(lista) {
+    if(!storageOk) return;
+    localStorage.setItem('alunosKaratêCompleto', JSON.stringify(lista));
+}
 
 function fazerBackup() {
     const dados = {
@@ -296,15 +346,16 @@ function fazerBackup() {
     const a = document.createElement('a');
     a.href = url;
     a.download = `backup-karate-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.json`;
+    document.body.appendChild(a);
     a.click();
+    document.body.removeChild(a);
     URL.revokeObjectURL(url);
     alert('✅ Backup baixado!');
 }
 
-function restaurarBackup(e) {
-    const arq = e.target.files[0];
-    if(!arq) return;
-    if(!confirm('⚠️ Vai substituir todos os dados? Tem certeza?')) { e.target.value=''; return; }
+function restaurarBackup(arquivo) {
+    if(!arquivo) return;
+    if(!confirm('⚠️ Vai substituir todos os dados? Tem certeza?')) return;
     const leitor = new FileReader();
     leitor.onload = function(ev) {
         try {
@@ -318,7 +369,7 @@ function restaurarBackup(e) {
             alert(`✅ Restaurado! ${dados.alunos.length} alunos.`);
         } catch(erro) { alert('❌ Erro: ' + erro.message); }
     };
-    leitor.readAsText(arq);
+    leitor.readAsText(arquivo);
 }
 
 document.querySelectorAll('.aba').forEach(aba => {
@@ -326,20 +377,23 @@ document.querySelectorAll('.aba').forEach(aba => {
         document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
         document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
         aba.classList.add('ativa');
-        document.getElementById(aba.dataset.alvo).classList.add('visivel');
-        if(aba.dataset.alvo === 'lista') exibirLista();
-        if(aba.dataset.alvo === 'pagamentos') exibirPagamentos();
-        if(aba.dataset.alvo === 'cadastro') {
-            document.getElementById('titulo-form').textContent = 'Cadastrar Novo Aluno';
-            document.getElementById('btnCancelarEdicao').classList.add('oculto');
-            document.getElementById('formAluno').reset();
-            document.getElementById('idAluno').value = '';
-            fotoBase64 = '';
-            document.getElementById('caixaFoto').innerHTML = '📷 Sem foto';
-            document.getElementById('areaHistorico').innerHTML = '';
-        }
+        const alvo = aba.getAttribute('data-alvo');
+        document.getElementById(alvo).classList.add('visivel');
+        if(alvo === 'lista') exibirLista();
+        if(alvo === 'pagamentos') exibirPagamentos();
+        if(alvo === 'cadastro') limparFormulario();
     });
 });
+
+function limparFormulario() {
+    document.getElementById('titulo-form').textContent = 'Cadastrar Novo Aluno';
+    document.getElementById('btnCancelarEdicao').classList.add('oculto');
+    document.getElementById('formAluno').reset();
+    document.getElementById('idAluno').value = '';
+    fotoBase64 = '';
+    document.getElementById('caixaFoto').innerHTML = '📷 Sem foto';
+    document.getElementById('areaHistorico').innerHTML = '';
+}
 
 function calcularIdade() {
     const nasc = document.getElementById('nascimento').value;
@@ -352,22 +406,21 @@ function calcularIdade() {
     document.getElementById('idade').value = `${idade} anos`;
 }
 
-function previewFoto(e) {
-    const arq = e.target.files[0];
-    if(!arq) return;
+function previewFoto(arquivo) {
+    if(!arquivo) return;
     const leitor = new FileReader();
     leitor.onload = function(ev) {
         fotoBase64 = ev.target.result;
         document.getElementById('caixaFoto').innerHTML = `<img src="${fotoBase64}">`;
     };
-    leitor.readAsDataURL(arq);
+    leitor.readAsDataURL(arquivo);
 }
 
 function adicionarLinhaHist(data='', faixa='') {
     const area = document.getElementById('areaHistorico');
-    const idLinha = Date.now();
-    area.innerHTML += `
-    <div class="entrada-hist" id="linha${idLinha}">
+    const div = document.createElement('div');
+    div.className = 'entrada-hist';
+    div.innerHTML = `
         <input type="date" class="dataExame" value="${data}">
         <select class="faixaConquistada">
             <option value="">Selecione</option>
@@ -380,69 +433,11 @@ function adicionarLinhaHist(data='', faixa='') {
             <option ${faixa==='Marrom'?'selected':''}>Marrom</option>
             <option ${faixa==='Preta'?'selected':''}>Preta</option>
         </select>
-        <button type="button" class="btn-vermelho" style="width:auto; padding:6px 10px;" onclick="document.getElementById('linha${idLinha}').remove()">✕</button>
-    </div>`;
+        <button type="button" class="btn-vermelho" style="width:auto; padding:6px 10px;">✕</button>
+    `;
+    div.querySelector('.btn-vermelho').addEventListener('click', () => div.remove());
+    area.appendChild(div);
 }
-
-function carregarAlunos() {
-    return JSON.parse(localStorage.getItem('alunosKaratêCompleto') || '[]');
-}
-function salvarAlunos(lista) {
-    localStorage.setItem('alunosKaratêCompleto', JSON.stringify(lista));
-}
-
-document.getElementById('formAluno').addEventListener('submit', e => {
-    e.preventDefault();
-    const nome = document.getElementById('nome').value.trim();
-    const nascimento = document.getElementById('nascimento').value;
-    const telResp = document.getElementById('telefoneResponsavel').value.trim().replace(/\D/g,'');
-    
-    if(!nome) { alert('⚠️ Preencha o nome!'); return; }
-    if(!nascimento) { alert('⚠️ Preencha a data de nascimento!'); return; }
-    if(telResp.length < 10) { alert('⚠️ Telefone incompleto!'); return; }
-    
-    const lista = carregarAlunos();
-    const id = document.getElementById('idAluno').value || Date.now();
-    
-    const historico = [];
-    document.querySelectorAll('.entrada-hist').forEach(linha => {
-        const d = linha.querySelector('.dataExame').value;
-        const f = linha.querySelector('.faixaConquistada').value;
-        if(d && f) historico.push({data: d, faixa: f});
-    });
-    
-    const dados = {
-        id,
-        nome,
-        nomeResponsavel: document.getElementById('nomeResponsavel').value.trim(),
-        nascimento,
-        idade: document.getElementById('idade').value,
-        endereco: document.getElementById('endereco').value.trim(),
-        telefoneResponsavel: document.getElementById('telefoneResponsavel').value.trim(),
-        telefoneAluno: document.getElementById('telefoneAluno').value.trim(),
-        email: document.getElementById('email').value.trim(),
-        foto: fotoBase64,
-        matricula: document.getElementById('matricula').value,
-        faixaAtual: document.getElementById('faixaAtual').value,
-        ultimoExame: document.getElementById('ultimoExame').value || null,
-        valorMensalidade: parseFloat(document.getElementById('valorMensalidade').value) || 0,
-        diaVencimento: parseInt(document.getElementById('diaVencimento').value) || 1,
-        historico,
-        pagamentos: []
-    };
-    
-    const indice = lista.findIndex(a => a.id == id);
-    if(indice >= 0) {
-        dados.pagamentos = lista[indice].pagamentos || [];
-        lista[indice] = dados;
-        alert(`✅ Atualizado: ${dados.nome}`);
-    } else {
-        lista.push(dados);
-        alert(`✅ Cadastrado: ${dados.nome}`);
-    }
-    salvarAlunos(lista);
-    document.querySelector('[data-alvo="lista"]').click();
-});
 
 function calcularStatus(aluno) {
     const hoje = new Date();
@@ -453,8 +448,7 @@ function calcularStatus(aluno) {
     if(!ultimoPagamento) return hoje > vencimentoMes ? 'atrasado' : 'pendente';
     const dataPag = new Date(ultimoPagamento.data + 'T00:00:00');
     const proximoVenc = new Date(dataPag.getFullYear(), dataPag.getMonth() + 1, diaVenc);
-    if(hoje <= proximoVenc) return 'pago';
-    return hoje > vencimentoMes ? 'atrasado' : 'pendente';
+    return hoje <= proximoVenc ? 'pago' : hoje > vencimentoMes ? 'atrasado' : 'pendente';
 }
 
 function getStatusTexto(status) {
@@ -468,15 +462,13 @@ function getStatusTexto(status) {
 function gerarDiploma(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
-    const cfg = JSON.parse(localStorage.getItem('configAcademia') || {});
+    const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
     const nomeAcademia = cfg.nomeAcademia || 'Academia de Karatê';
     const cidade = cfg.cidadeAcademia || '';
     const instrutor = cfg.nomeInstrutor || 'Instrutor';
     const assinatura2 = cfg.assinatura2 || '';
-    
     const dataExame = aluno.ultimoExame ? new Date(aluno.ultimoExame + 'T00:00:00') : new Date();
     const dataFormatada = dataExame.toLocaleDateString('pt-BR', {day: '2-digit', month: 'long', year: 'numeric'});
-    
     const assinatura2HTML = assinatura2 ? `<div class="assinatura" style="text-align:center;"><br><br><strong>${assinatura2}</strong></div>` : '';
     
     document.getElementById('conteudoDiploma').innerHTML = `
@@ -503,9 +495,6 @@ function fecharDiploma() {
     document.getElementById('modalDiploma').classList.remove('aberto');
     document.body.style.overflow = 'auto';
 }
-function fecharDiplomaClique(e) {
-    if(e.target.id === 'modalDiploma') fecharDiploma();
-}
 
 function enviarAvisoAtraso(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
@@ -515,7 +504,7 @@ function enviarAvisoAtraso(id) {
     if(tel.length < 10) { alert('⚠️ Telefone inválido!'); return; }
     const valor = (aluno.valorMensalidade || 0).toFixed(2);
     const nomeResp = aluno.nomeResponsavel || 'Responsável';
-    const cfg = JSON.parse(localStorage.getItem('configAcademia') || {});
+    const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
     const nomeAcad = cfg.nomeAcademia || 'Academia de Karatê';
     const mensagem = `⚠️ AVISO DE ATRASO\nOlá, ${nomeResp}! Somos da ${nomeAcad}. A mensalidade de ${aluno.nome} está atrasada: R$ ${valor}. Por favor regularize. Obrigado! 🙏🥋`;
     window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
@@ -527,90 +516,6 @@ function enviarWhatsApp(id) {
     const mensagem = `🥋 FICHA — ${aluno.nome}\nResp: ${aluno.nomeResponsavel || '-'}\nTel: ${aluno.telefoneResponsavel}\nNasc: ${aluno.nascimento} — ${aluno.idade}\nFaixa: ${aluno.faixaAtual}\nMensalidade: R$ ${(aluno.valorMensalidade||0).toFixed(2)}`;
     const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
     window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(mensagem)}`, '_blank');
-}
-
-function exibirLista() {
-    const busca = document.getElementById('campoBusca').value.toLowerCase();
-    let lista = carregarAlunos();
-    if(busca) lista = lista.filter(a => a.nome.toLowerCase().includes(busca) || a.faixaAtual.toLowerCase().includes(busca));
-    document.getElementById('quantidade').innerHTML = `<strong>${lista.length}</strong> aluno(s)`;
-    const div = document.getElementById('listaAlunos');
-    div.innerHTML = '';
-    if(lista.length === 0) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno cadastrado.</p>'; return; }
-    lista.forEach(aluno => {
-        const status = calcularStatus(aluno);
-        div.innerHTML += `
-        <div class="item-aluno">
-            <div class="cabecalho-aluno">
-                <div class="foto-preview" style="width:100px; height:120px;">${aluno.foto ? `<img src="${aluno.foto}">` : '📷'}</div>
-                <div class="dados-principais">
-                    <h3>${aluno.nome}</h3>
-                    <p>👤 Resp: ${aluno.nomeResponsavel || '-'}</p>
-                    <p>📞 Resp: ${aluno.telefoneResponsavel}</p>
-                    <p>Faixa: <span class="faixa-${aluno.faixaAtual.toLowerCase()}">${aluno.faixaAtual}</span></p>
-                    <p>Pagamento: ${getStatusTexto(status)}</p>
-                </div>
-                <div class="botoes-acao">
-                    ${status==='atrasado'?`<button class="btn-vermelho" onclick="enviarAvisoAtraso(${aluno.id})">⚠️ Aviso</button>`:''}
-                    <button class="btn-roxo" onclick="gerarDiploma(${aluno.id})">🖨️ Diploma</button>
-                    <button class="btn-amarelo" onclick="editarAluno(${aluno.id})">✏️ Editar</button>
-                    <button class="btn-azul-claro" onclick="gerarFichaPDF(${aluno.id})">📄 PDF</button>
-                    <button class="btn-whats" onclick="enviarWhatsApp(${aluno.id})">💬 WhatsApp</button>
-                    <button class="btn-vermelho" onclick="if(confirm('Excluir ${aluno.nome}?')){excluirAluno(${aluno.id})}">🗑️ Excluir</button>
-                </div>
-            </div>
-        </div>`;
-    });
-}
-
-function exibirPagamentos() {
-    const filtro = document.getElementById('filtroPagamento').value;
-    let lista = carregarAlunos();
-    let totalPagos=0, totalPendentes=0, totalAtrasados=0;
-    lista = lista.map(a => {
-        a.statusPagamento = calcularStatus(a);
-        if(a.statusPagamento==='pago') totalPagos++;
-        else if(a.statusPagamento==='pendente') totalPendentes++;
-        else totalAtrasados++;
-        return a;
-    });
-    document.getElementById('totalAlunos').textContent = lista.length;
-    document.getElementById('totalPagos').textContent = totalPagos;
-    document.getElementById('totalPendentes').textContent = totalPendentes;
-    document.getElementById('totalAtrasados').textContent = totalAtrasados;
-    if(filtro!=='todos') lista = lista.filter(a => a.statusPagamento === filtro);
-    const div = document.getElementById('listaPagamentos');
-    div.innerHTML = '';
-    if(lista.length===0) { div.innerHTML='<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
-    lista.forEach(aluno => {
-        div.innerHTML += `
-        <div class="item-aluno">
-            <div class="linha" style="align-items:center;">
-                <div class="col" style="flex:2;"><h4>${aluno.nome}</h4><p>Faixa: ${aluno.faixaAtual}</p></div>
-                <div class="col" style="flex:1;"><p>R$ ${(aluno.valorMensalidade||0).toFixed(2)}</p><p>Dia ${aluno.diaVencimento}</p></div>
-                <div class="col" style="flex:1;">${getStatusTexto(aluno.statusPagamento)}</div>
-                <div class="col" style="flex:1;">
-                    ${aluno.statusPagamento==='atrasado'?`<button class="btn-vermelho" style="padding:6px;" onclick="enviarAvisoAtraso(${aluno.id})">⚠️ Aviso</button>`:''}
-                    <button class="btn-verde" style="padding:6px; margin-left:5px;" onclick="registrarPagamento(${aluno.id})">Registrar</button>
-                </div>
-            </div>
-        </div>`;
-    });
-}
-
-function registrarPagamento(id) {
-    const lista = carregarAlunos();
-    const aluno = lista.find(a => a.id === id);
-    if(!aluno) return;
-    const valor = prompt(`Valor para ${aluno.nome}?\nSugerido: R$ ${(aluno.valorMensalidade||0).toFixed(2)}`);
-    if(valor===null) return;
-    const valorFinal = parseFloat(valor.replace(',','.')) || aluno.valorMensalidade || 0;
-    const data = new Date().toISOString().split('T')[0];
-    if(!aluno.pagamentos) aluno.pagamentos = [];
-    aluno.pagamentos.push({data, valor: valorFinal, status:'pago'});
-    salvarAlunos(lista);
-    alert(`✅ Pgto registrado!\nValor: R$ ${valorFinal.toFixed(2)}`);
-    exibirPagamentos();
 }
 
 function editarAluno(id) {
@@ -639,43 +544,37 @@ function editarAluno(id) {
     if(aluno.historico && aluno.historico.length>0) aluno.historico.forEach(h => adicionarLinhaHist(h.data, h.faixa));
 }
 
-function cancelarEdicao() { document.querySelector('[data-alvo="lista"]').click(); }
 function excluirAluno(id) {
     if(!confirm('Confirma exclusão?')) return;
     salvarAlunos(carregarAlunos().filter(a => a.id !== id));
     exibirLista();
 }
 
-function exportarExcel() {
+function registrarPagamento(id) {
     const lista = carregarAlunos();
-    if(!lista.length) { alert('Sem dados!'); return; }
-    const cab = ['Nome','Resp','Tel Resp','Nasc','Faixa','Valor','Vencimento','Status'];
-    const linhas = lista.map(a => [
-        a.nome, a.nomeResponsavel||'', a.telefoneResponsavel, a.nascimento, a.faixaAtual,
-        (a.valorMensalidade||0).toFixed(2).replace('.',','), a.diaVencimento||1, calcularStatus(a)
-    ]);
-    let csv = cab.join(';')+'\n';
-    linhas.forEach(l => csv += l.join(';')+'\n');
-    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `alunos-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    alert('✅ Exportado! Abra no Excel.');
+    const aluno = lista.find(a => a.id === id);
+    if(!aluno) return;
+    const valor = prompt(`Valor para ${aluno.nome}?\nSugerido: R$ ${(aluno.valorMensalidade||0).toFixed(2)}`);
+    if(valor===null) return;
+    const valorFinal = parseFloat(valor.replace(',','.')) || aluno.valorMensalidade || 0;
+    const data = new Date().toISOString().split('T')[0];
+    if(!aluno.pagamentos) aluno.pagamentos = [];
+    aluno.pagamentos.push({data, valor: valorFinal, status:'pago'});
+    salvarAlunos(lista);
+    alert(`✅ Pgto registrado!\nValor: R$ ${valorFinal.toFixed(2)}`);
+    exibirPagamentos();
 }
 
 function gerarFichaPDF(id) {
+    if(!verificarPdfMake()) return;
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
-    const cfg = JSON.parse(localStorage.getItem('configAcademia') || {});
-    const nomeAcad = cfg.nomeAcademia || 'Academia de Karatê';
+    const cfg = JSON.parse(localStorage.getItem('configAcademia') || '{}');
     const hist = aluno.historico?.length ? aluno.historico.map(h => `${h.data} — ${h.faixa}`).join('\n') : 'Sem registros';
     const doc = {
         pageSize:'A4',
         content: [
-            {text:nomeAcad, fontSize:20, bold:true, alignment:'center', margin:[0,0,0,5]},
+            {text: cfg.nomeAcademia || 'Academia de Karatê', fontSize:20, bold:true, alignment:'center', margin:[0,0,0,5]},
             {text:'FICHA CADASTRAL', fontSize:16, bold:true, alignment:'center', margin:[0,0,0,20]},
             {text:'📋 Dados Pessoais', bold:true, fontSize:14, margin:[0,10,0,5]},
             {table:{widths:['30%','70%'], body:[
@@ -694,8 +593,188 @@ function gerarFichaPDF(id) {
         ],
         defaultStyle:{fontSize:11}
     };
-    pdfMake.createPdf(doc).download(`ficha_${aluno.nome.replaceAll(' ','_')}.pdf`);
+    pdfmake.createPdf(doc).download(`ficha_${aluno.nome.replaceAll(' ','_')}.pdf`);
 }
+
+function exportarExcel() {
+    const lista = carregarAlunos();
+    if(!lista.length) { alert('Sem dados!'); return; }
+    const cab = ['Nome','Resp','Tel Resp','Nasc','Faixa','Valor','Vencimento','Status'];
+    const linhas = lista.map(a => [
+        a.nome, a.nomeResponsavel||'', a.telefoneResponsavel, a.nascimento, a.faixaAtual,
+        (a.valorMensalidade||0).toFixed(2).replace('.',','), a.diaVencimento||1, calcularStatus(a)
+    ]);
+    let csv = cab.join(';')+'\n';
+    linhas.forEach(l => csv += l.join(';')+'\n');
+    const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `alunos-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    alert('✅ Exportado! Abra no Excel.');
+}
+
+function exibirLista() {
+    const busca = document.getElementById('campoBusca').value.toLowerCase();
+    let lista = carregarAlunos();
+    if(busca) lista = lista.filter(a => a.nome.toLowerCase().includes(busca) || a.faixaAtual.toLowerCase().includes(busca));
+    document.getElementById('quantidade').innerHTML = `<strong>${lista.length}</strong> aluno(s)`;
+    const div = document.getElementById('listaAlunos');
+    div.innerHTML = '';
+    if(lista.length === 0) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno cadastrado.</p>'; return; }
+    lista.forEach(aluno => {
+        const status = calcularStatus(aluno);
+        const item = document.createElement('div');
+        item.className = 'item-aluno';
+        item.innerHTML = `
+        <div class="cabecalho-aluno">
+            <div class="foto-preview" style="width:100px; height:120px;">${aluno.foto ? `<img src="${aluno.foto}">` : '📷'}</div>
+            <div class="dados-principais">
+                <h3>${aluno.nome}</h3>
+                <p>👤 Resp: ${aluno.nomeResponsavel || '-'}</p>
+                <p>📞 Resp: ${aluno.telefoneResponsavel}</p>
+                <p>Faixa: <span class="faixa-${aluno.faixaAtual.toLowerCase()}">${aluno.faixaAtual}</span></p>
+                <p>Pagamento: ${getStatusTexto(status)}</p>
+            </div>
+            <div class="botoes-acao" data-id="${aluno.id}">
+                ${status==='atrasado'?`<button class="btn-vermelho acao-aviso">⚠️ Aviso</button>`:''}
+                <button class="btn-roxo acao-diploma">🖨️ Diploma</button>
+                <button class="btn-amarelo acao-editar">✏️ Editar</button>
+                <button class="btn-azul-claro acao-pdf">📄 PDF</button>
+                <button class="btn-whats acao-whats">💬 WhatsApp</button>
+                <button class="btn-vermelho acao-excluir">🗑️ Excluir</button>
+            </div>
+        </div>`;
+        div.appendChild(item);
+        const botoes = item.querySelector('.botoes-acao');
+        const id = aluno.id;
+        botoes.querySelector('.acao-diploma').addEventListener('click', () => gerarDiploma(id));
+        botoes.querySelector('.acao-editar').addEventListener('click', () => editarAluno(id));
+        botoes.querySelector('.acao-pdf').addEventListener('click', () => gerarFichaPDF(id));
+        botoes.querySelector('.acao-whats').addEventListener('click', () => enviarWhatsApp(id));
+        botoes.querySelector('.acao-excluir').addEventListener('click', () => { if(confirm('Excluir '+aluno.nome+'?')) excluirAluno(id); });
+        if(status==='atrasado') botoes.querySelector('.acao-aviso').addEventListener('click', () => enviarAvisoAtraso(id));
+    });
+}
+
+function exibirPagamentos() {
+    const filtro = document.getElementById('filtroPagamento').value;
+    let lista = carregarAlunos();
+    let totalPagos=0, totalPendentes=0, totalAtrasados=0;
+    lista = lista.map(a => {
+        a.statusPagamento = calcularStatus(a);
+        if(a.statusPagamento==='pago') totalPagos++;
+        else if(a.statusPagamento==='pendente') totalPendentes++;
+        else totalAtrasados++;
+        return a;
+    });
+    document.getElementById('totalAlunos').textContent = lista.length;
+    document.getElementById('totalPagos').textContent = totalPagos;
+    document.getElementById('totalPendentes').textContent = totalPendentes;
+    document.getElementById('totalAtrasados').textContent = totalAtrasados;
+    if(filtro!=='todos') lista = lista.filter(a => a.statusPagamento === filtro);
+    const div = document.getElementById('listaPagamentos');
+    div.innerHTML = '';
+    if(lista.length===0) { div.innerHTML='<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
+    lista.forEach(aluno => {
+        const item = document.createElement('div');
+        item.className = 'item-aluno';
+        item.innerHTML = `
+        <div class="linha" style="align-items:center;">
+            <div class="col" style="flex:2;"><h4>${aluno.nome}</h4><p>Faixa: ${aluno.faixaAtual}</p></div>
+            <div class="col" style="flex:1;"><p>R$ ${(aluno.valorMensalidade||0).toFixed(2)}</p><p>Dia ${aluno.diaVencimento}</p></div>
+            <div class="col" style="flex:1;">${getStatusTexto(aluno.statusPagamento)}</div>
+            <div class="col" style="flex:1;" data-id="${aluno.id}">
+                ${aluno.statusPagamento==='atrasado'?`<button class="btn-vermelho" style="padding:6px;">⚠️ Aviso</button>`:''}
+                <button class="btn-verde" style="padding:6px; margin-left:5px;">Registrar</button>
+            </div>
+        </div>`;
+        div.appendChild(item);
+        const acoes = item.querySelector('[data-id]');
+        const id = aluno.id;
+        const botoes = acoes.querySelectorAll('button');
+        if(botoes.length === 2) {
+            botoes[0].addEventListener('click', () => enviarAvisoAtraso(id));
+            botoes[1].addEventListener('click', () => registrarPagamento(id));
+        } else if(botoes.length === 1) {
+            botoes[0].addEventListener('click', () => registrarPagamento(id));
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    carregarConfiguracoes();
+    
+    document.getElementById('nascimento').addEventListener('change', calcularIdade);
+    document.getElementById('foto').addEventListener('change', (e) => previewFoto(e.target.files[0]));
+    
+    document.getElementById('formAluno').addEventListener('submit', e => {
+        e.preventDefault();
+        const nome = document.getElementById('nome').value.trim();
+        const nascimento = document.getElementById('nascimento').value;
+        const telResp = document.getElementById('telefoneResponsavel').value.trim().replace(/\D/g,'');
+        if(!nome) { alert('⚠️ Preencha o nome!'); return; }
+        if(!nascimento) { alert('⚠️ Preencha a data de nascimento!'); return; }
+        if(telResp.length < 10) { alert('⚠️ Telefone incompleto!'); return; }
+        
+        const lista = carregarAlunos();
+        const id = document.getElementById('idAluno').value || Date.now();
+        const historico = [];
+        document.querySelectorAll('.entrada-hist').forEach(linha => {
+            const d = linha.querySelector('.dataExame').value;
+            const f = linha.querySelector('.faixaConquistada').value;
+            if(d && f) historico.push({data: d, faixa: f});
+        });
+        const dados = {
+            id, nome,
+            nomeResponsavel: document.getElementById('nomeResponsavel').value.trim(),
+            nascimento,
+            idade: document.getElementById('idade').value,
+            endereco: document.getElementById('endereco').value.trim(),
+            telefoneResponsavel: document.getElementById('telefoneResponsavel').value.trim(),
+            telefoneAluno: document.getElementById('telefoneAluno').value.trim(),
+            email: document.getElementById('email').value.trim(),
+            foto: fotoBase64,
+            matricula: document.getElementById('matricula').value,
+            faixaAtual: document.getElementById('faixaAtual').value,
+            ultimoExame: document.getElementById('ultimoExame').value || null,
+            valorMensalidade: parseFloat(document.getElementById('valorMensalidade').value) || 0,
+            diaVencimento: parseInt(document.getElementById('diaVencimento').value) || 1,
+            historico,
+            pagamentos: []
+        };
+        const indice = lista.findIndex(a => a.id == id);
+        if(indice >= 0) {
+            dados.pagamentos = lista[indice].pagamentos || [];
+            lista[indice] = dados;
+            alert(`✅ Atualizado: ${dados.nome}`);
+        } else {
+            lista.push(dados);
+            alert(`✅ Cadastrado: ${dados.nome}`);
+        }
+        salvarAlunos(lista);
+        document.querySelector('[data-alvo="lista"]').click();
+    });
+
+    document.getElementById('btnSalvarConfig').addEventListener('click', salvarConfiguracoes);
+    document.getElementById('btnBackup').addEventListener('click', fazerBackup);
+    document.getElementById('arquivoBackup').addEventListener('change', (e) => restaurarBackup(e.target.files[0]));
+    document.getElementById('btnAddHist').addEventListener('click', () => adicionarLinhaHist());
+    document.getElementById('btnCancelarEdicao').addEventListener('click', () => document.querySelector('[data-alvo="lista"]').click());
+    document.getElementById('campoBusca').addEventListener('input', exibirLista);
+    document.getElementById('btnExportar').addEventListener('click', exportarExcel);
+    document.getElementById('filtroPagamento').addEventListener('change', exibirPagamentos);
+    document.getElementById('btnImprimir').addEventListener('click', () => window.print());
+    document.getElementById('btnFecharDiploma').addEventListener('click', fecharDiploma);
+    document.getElementById('modalDiploma').addEventListener('click', (e) => {
+        if(e.target.id
+        === 'modalDiploma') fecharDiploma();
+    });
+});
 </script>
 </body>
 </html>
