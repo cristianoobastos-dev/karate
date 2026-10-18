@@ -4,23 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Alunos — Karatê</title>
-    <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/pdfmake.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pdfmake@0.2.10/build/vfs_fonts.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: sans-serif !important; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: serif !important; }
         html { font-size: 16px; }
         body { background: #f0f4f8; padding: 15px; }
         .container { max-width: 1000px; margin: 0 auto; }
-        h1 { text-align: center; color: #b91c1c; margin-bottom: 25px; }
-        h3 { margin: 20px 0 10px; color: #333; }
+        h1 { text-align: center; color: #b91c1c; margin-bottom: 25px; font-family: sans-serif !important; }
+        h3 { margin: 20px 0 10px; color: #333; font-family: sans-serif !important; }
         .abas { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .aba { padding: 12px 20px; background: #ddd; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .aba { padding: 12px 20px; background: #ddd; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-family: sans-serif !important; }
         .aba.ativa { background: #b91c1c; color: white; }
         .conteudo-aba { display: none; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .conteudo-aba.visivel { display: block; }
         .grupo { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; }
-        input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; font-family: sans-serif !important; }
+        input, select, button { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; font-family: sans-serif !important; }
         button { background: #2563eb; color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 5px; }
         button:hover { opacity: 0.9; }
         .btn-vermelho { background: #dc2626; }
@@ -29,7 +27,6 @@
         .btn-azul-claro { background: #0ea5e9; }
         .btn-laranja { background: #f97316; }
         .btn-roxo { background: #7c3aed; }
-        .btn-whats { background: #25d366; }
         .linha { display: flex; gap: 15px; flex-wrap: wrap; }
         .col { flex: 1; min-width: 200px; }
         .item-aluno { border: 1px solid #e5e7eb; border-radius: 8px; padding: 15px; margin: 12px 0; background: #fafafa; }
@@ -54,19 +51,33 @@
         .resumo { background: #eff6ff; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
         .botoes-acao { display: flex; flex-direction: column; gap: 5px; min-width: 140px; }
         .secao-exame { background: #f8fafc; padding: 15px; border-radius: 8px; margin: 15px 0; border-left: 4px solid #7c3aed; }
-        .lista-pagamentos { margin-top: 10px; font-size: 14px; }
-        .pagamento-item { padding: 4px 0; border-bottom: 1px solid #eee; }
         .modal-diploma { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 20px; overflow: auto; }
         .modal-diploma.aberto { display: flex; }
         .diploma-container { background: white; width: 210mm; min-height: 297mm; padding: 15mm; position: relative; }
-        .diploma-borda { border: 8px double #8b4513; width: 100%; height: 100%; padding: 20mm; text-align: center; }
+        .diploma-borda { border: 8px double #8b4513; width: 100%; height: 100%; padding: 20mm; text-align: center; position: relative; overflow: hidden; }
+        .diploma-borda::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' opacity='0.06'%3E%3Ctext x='50%25' y='50%25' font-size='180' text-anchor='middle' fill='%23666'%3E🥋%3C/text%3E%3C/svg%3E");
+            background-repeat: repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .diploma-conteudo { position: relative; z-index: 1; }
         .diploma-titulo { font-size: 32px; font-weight: bold; color: #8b4513; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 3px; }
-        .diploma-nome { font-size: 28px; font-weight: bold; margin: 20px 0; color: #b91c1c; text-transform: uppercase; }
-        .diploma-faixa { font-size: 24px; font-weight: bold; color: #2563eb; margin: 15px 0; }
-        .diploma-assinaturas { display: flex; justify-content: space-between; margin-top: 60px; }
-        .assinatura { border-top: 1px solid #333; width: 200px; padding-top: 10px; }
-        .botoes-impressao { position: sticky; top: 10px; text-align: center; margin-bottom: 15px; z-index: 1001; }
-        .aviso-sistema { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 10px 15px; margin-bottom: 20px; border-radius: 4px; }
+        .diploma-subtitulo { font-size: 20px; color: #333; margin-bottom: 40px; }
+        .diploma-intro { font-size: 22px; color: #333; margin-bottom: 10px; }
+        .diploma-nome { font-size: 36px; font-weight: bold; margin: 20px 0; color: #b91c1c; text-transform: uppercase; font-style: italic; }
+        .diploma-texto { font-size: 20px; line-height: 1.8; color: #333; max-width: 900px; margin: 0 auto; }
+        .diploma-faixa-destaque { font-weight: bold; color: #2563eb; font-size: 24px; }
+        .diploma-data { font-size: 18px; margin: 30px 0; color: #555; }
+        .diploma-assinaturas { display: flex; justify-content: space-between; margin-top: 80px; }
+        .assinatura { border-top: 1px solid #333; width: 200px; padding-top: 10px; font-size: 16px; }
+        .botoes-impressao { position: sticky; top: 10px; text-align: center; margin-bottom: 15px; z-index: 1001; font-family: sans-serif !important; }
+        .logo-projeto { position: absolute; top: 10mm; left: 15mm; text-align: left; }
+        .logo-projeto .projeto { font-size: 14px; color: #666; }
+        .logo-projeto .peniel { font-size: 28px; font-weight: bold; color: #333; letter-spacing: 2px; }
         @media print {
             .botoes-impressao, .botoes-acao, .abas, .container > h1 { display: none !important; }
             .modal-diploma { position: static; background: white; display: block !important; }
@@ -77,8 +88,7 @@
 </head>
 <body>
 <div class="container">
-    <div id="avisoSistema" class="aviso-sistema oculto"></div>
-    <h1>🥋 Cadastro de Alunos — Dojo de Karatê Sansei Roberto</h1>
+    <h1>🥋 Cadastro de Alunos — Karatê</h1>
     <div class="abas">
         <button class="aba ativa" data-alvo="cadastro">Novo Aluno</button>
         <button class="aba" data-alvo="lista">Lista</button>
@@ -89,7 +99,7 @@
 
     <div id="configuracoes" class="conteudo-aba">
         <h2>⚙️ Dados da Academia</h2>
-        <div class="grupo"><label>Nome da Academia</label><input type="text" id="nomeAcademia"></div>
+        <div class="grupo"><label>Nome da Academia/Projeto</label><input type="text" id="nomeAcademia" placeholder="Ex: Projeto Peniel"></div>
         <div class="grupo"><label>Cidade/UF</label><input type="text" id="cidadeAcademia"></div>
         <div class="grupo"><label>Nome do Instrutor</label><input type="text" id="nomeInstrutor"></div>
         <div class="grupo"><label>2ª Assinatura</label><input type="text" id="assinatura2"></div>
@@ -211,12 +221,18 @@
 </div>
 
 <script>
-// === FUNÇÕES AUXILIARES ===
+// ==================================================
+// 🔧 FUNÇÕES — TODAS DEFINIDAS PRIMEIRO
+// ==================================================
+
+// --- Armazenamento ---
 function carregarAlunos() {
     try { return JSON.parse(localStorage.getItem('alunosKaratêCompleto') || '[]'); }
     catch { return []; }
 }
-function salvarAlunos(lista) { localStorage.setItem('alunosKaratêCompleto', JSON.stringify(lista)); }
+function salvarAlunos(lista) { 
+    localStorage.setItem('alunosKaratêCompleto', JSON.stringify(lista)); 
+}
 function carregarConfig() {
     try { return JSON.parse(localStorage.getItem('configAcademia') || '{}'); }
     catch { return {}; }
@@ -229,10 +245,14 @@ function salvarConfig() {
         assinatura2: document.getElementById('assinatura2').value.trim()
     };
     localStorage.setItem('configAcademia', JSON.stringify(cfg));
-    alert('✅ Salvo!');
+    alert('✅ Configurações salvas!');
+}
+function getNomeAcademia() {
+    const cfg = carregarConfig();
+    return cfg.nomeAcademia || 'Academia de Karatê';
 }
 
-// === CÁLCULOS ===
+// --- Cálculos ---
 function calcularSaldoMensal(aluno) {
     const totalPago = (aluno.pagamentos || []).reduce((soma, p) => soma + (Number(p.valor) || 0), 0);
     return Math.max(0, (aluno.valorMensalidade || 0) - totalPago);
@@ -257,38 +277,74 @@ function statusTexto(s) {
     }
 }
 
-// === WHATSAPP / RECIBOS ===
+// --- Mensagens WhatsApp com Nome da Academia ---
 function enviarReciboMensal(aluno, valorPago, dataPg) {
     const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
     if(tel.length < 10) { alert('Telefone inválido!'); return; }
     const saldo = calcularSaldoMensal(aluno);
-    const msg = `🧾 RECIBO MENSALIDADE
+    const academia = getNomeAcademia();
+    const msg = `🏫 ${academia}
+
+🧾 RECIBO DE MENSALIDADE
 Aluno: ${aluno.nome}
 Faixa: ${aluno.faixaAtual}
 Data: ${dataPg}
-Valor: R$ ${valorPago.toFixed(2).replace('.',',')}
+Valor pago: R$ ${valorPago.toFixed(2).replace('.',',')}
 Mensalidade: R$ ${(aluno.valorMensalidade||0).toFixed(2).replace('.',',')}
-${saldo>0?`Saldo: R$ ${saldo.toFixed(2).replace('.',',')} ⚠️`:'✅ Tudo em dia!'}
-Obrigado! 🥋`;
+
+${saldo>0?`Saldo restante: R$ ${saldo.toFixed(2).replace('.',',')} ⚠️`:'✅ Pagamento em dia!'}
+
+Obrigado! 🥋
+${academia}`;
     window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
 }
+
 function enviarReciboExame(aluno, valorPago, dataPg) {
     const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
     if(tel.length < 10) { alert('Telefone inválido!'); return; }
     const saldo = calcularSaldoExame(aluno);
-    const msg = `🎓 RECIBO TAXA DE EXAME
+    const academia = getNomeAcademia();
+    const msg = `🏫 ${academia}
+
+🎓 RECIBO — TAXA DE EXAME
 Aluno: ${aluno.nome}
 Faixa: ${aluno.faixaAtual}
 Data: ${dataPg}
-Valor: R$ ${valorPago.toFixed(2).replace('.',',')}
-Taxa total: R$ ${(aluno.valorExameFaixa||0).toFixed(2).replace('.',',')}
-${aluno.dataPrevExame?'Exame: '+aluno.dataPrevExame.split('-').reverse().join('/')+'\n':''}
-${saldo>0?`Saldo: R$ ${saldo.toFixed(2).replace('.',',')} ⚠️`:'✅ Quitado! Pronto!'}
-Boa sorte! 🥋`;
+Valor pago: R$ ${valorPago.toFixed(2).replace('.',',')}
+Valor total: R$ ${(aluno.valorExameFaixa||0).toFixed(2).replace('.',',')}
+${aluno.dataPrevExame?'Data exame: '+aluno.dataPrevExame.split('-').reverse().join('/')+'\n':''}
+
+${saldo>0?`Saldo restante: R$ ${saldo.toFixed(2).replace('.',',')} ⚠️`:'✅ Quitado! Pronto para o exame!'}
+
+Boa sorte! 🥋
+${academia}`;
     window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
 }
 
-// === REGISTRAR PAGAMENTOS ===
+function enviarAviso(id) {
+    const aluno = carregarAlunos().find(a => a.id === id);
+    if(!aluno) return;
+    const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
+    if(tel.length < 10) { alert('Telefone inválido!'); return; }
+    const saldoMensal = calcularSaldoMensal(aluno);
+    const saldoExame = calcularSaldoExame(aluno);
+    const academia = getNomeAcademia();
+    let msg = `🏫 ${academia}
+
+⚠️ AVISO DE PENDÊNCIA
+Aluno: ${aluno.nome}
+
+${saldoMensal>0?`💰 Mensalidade pendente: R$ ${saldoMensal.toFixed(2).replace('.',',')}`:''}
+${saldoExame>0?`🎓 Taxa de exame pendente: R$ ${saldoExame.toFixed(2).replace('.',',')}`:''}
+
+Por favor, regularize o quanto antes.
+Agradecemos pela compreensão! 🥋
+
+${academia}`;
+    window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
+}
+
+// --- Ações de Pagamento ---
 function registrarMensal(id) {
     const lista = carregarAlunos();
     const aluno = lista.find(a => a.id === id);
@@ -303,11 +359,13 @@ function registrarMensal(id) {
     aluno.pagamentos.push({data: dataPg, valor: pago});
     salvarAlunos(lista);
     const novoSaldo = calcularSaldoMensal(aluno);
-    if(confirm(`✅ Registrado!\nSaldo restante: R$ ${novoSaldo.toFixed(2)}\nEnviar recibo?`)) {
+    if(confirm(`✅ Registrado!\nSaldo restante: R$ ${novoSaldo.toFixed(2)}\nEnviar recibo por WhatsApp?`)) {
         enviarReciboMensal(aluno, pago, dataPg.split('-').reverse().join('/'));
     }
-    exibirLista(); exibirPagamentos();
+    exibirLista(); 
+    exibirPagamentos();
 }
+
 function registrarExame(id) {
     const lista = carregarAlunos();
     const aluno = lista.find(a => a.id === id);
@@ -322,36 +380,110 @@ function registrarExame(id) {
     aluno.pagamentosExame.push({data: dataPg, valor: pago});
     salvarAlunos(lista);
     const novoSaldo = calcularSaldoExame(aluno);
-    if(confirm(`✅ Registrado!\nSaldo restante: R$ ${novoSaldo.toFixed(2)}\nEnviar recibo?`)) {
+    if(confirm(`✅ Registrado!\nSaldo restante: R$ ${novoSaldo.toFixed(2)}\nEnviar recibo por WhatsApp?`)) {
         enviarReciboExame(aluno, pago, dataPg.split('-').reverse().join('/'));
     }
-    exibirLista(); exibirPagamentos();
+    exibirLista(); 
+    exibirPagamentos();
 }
 
-// === DIPLOMA ===
+// --- Diploma com TEXTO PERSONALIZADO ---
 function gerarDiploma(id) {
     const aluno = carregarAlunos().find(a => a.id === id);
     if(!aluno) return;
     const cfg = carregarConfig();
+    
+    // Texto exato que você pediu! ✅
+    const textoPromocao = `Foi promovido(a) a faixa <span class="diploma-faixa-destaque">${aluno.faixaAtual}</span> de Karatê Shotokan com toda honra e mérito, tendo cumprido todos os requisitos necessários de Técnica, Disciplina, Capacidade e Esforço.`;
+    
     document.getElementById('conteudoDiploma').innerHTML = `
         <div class="diploma-borda">
-            <div class="diploma-titulo">${cfg.nomeAcademia||'Academia de Karatê'}</div>
-            <h2 style="font-size:26px; color:#8b4513; margin:30px 0;">CERTIFICADO DE PROMOÇÃO</h2>
-            <div style="font-size:18px;">Certificamos que</div>
-            <div class="diploma-nome">${aluno.nome}</div>
-            <div style="font-size:18px;">conquistou a faixa</div>
-            <div class="diploma-faixa">🥋 ${aluno.faixaAtual}</div>
-            ${aluno.ultimoExame?`<div style="font-size:16px; margin:20px 0;">Conquistado em ${new Date(aluno.ultimoExame+'T00:00:00').toLocaleDateString('pt-BR')}</div>`:''}
-            <div class="diploma-assinaturas">
-                <div class="assinatura" style="text-align:center;"><br><br><strong>${cfg.nomeInstrutor||'Instrutor Responsável'}</strong></div>
-                ${cfg.assinatura2?`<div class="assinatura" style="text-align:center;"><br><br><strong>${cfg.assinatura2}</strong></div>`:''}
+            <div class="logo-projeto diploma-conteudo">
+                <div class="projeto">projeto</div>
+                <div class="peniel">${cfg.nomeAcademia||'PENIEL'}</div>
+            </div>
+            <div class="diploma-conteudo">
+                <div class="diploma-intro">Certificamos que</div>
+                <div class="diploma-nome">${aluno.nome}</div>
+                <div class="diploma-texto">
+                    ${textoPromocao}
+                </div>
+                ${aluno.ultimoExame?`<div class="diploma-data">Conquistado em ${new Date(aluno.ultimoExame+'T00:00:00').toLocaleDateString('pt-BR')}</div>`:''}
+                <div class="diploma-assinaturas">
+                    <div class="assinatura" style="text-align:center;"><br><br><strong>${cfg.nomeInstrutor||'Instrutor Responsável'}</strong></div>
+                    ${cfg.assinatura2?`<div class="assinatura" style="text-align:center;"><br><br><strong>${cfg.assinatura2}</strong></div>`:''}
+                </div>
             </div>
         </div>`;
     document.getElementById('modalDiploma').classList.add('aberto');
 }
-function fecharDiploma() { document.getElementById('modalDiploma').classList.remove('aberto'); }
 
-// === EXIBIR LISTA ===
+function fecharDiploma() { 
+    document.getElementById('modalDiploma').classList.remove('aberto'); 
+}
+
+// --- Excluir/Editar ---
+function excluirAluno(id) { 
+    if(confirm('Excluir este aluno permanentemente?')) {
+        salvarAlunos(carregarAlunos().filter(a => a.id !== id)); 
+        exibirLista(); 
+        exibirPagamentos();
+    }
+}
+
+function editarAluno(id) {
+    const aluno = carregarAlunos().find(a => a.id === id);
+    if(!aluno) return;
+    document.querySelector('[data-alvo="cadastro"]').click();
+    document.getElementById('titulo-form').textContent = 'Editar Aluno';
+    document.getElementById('btnCancelarEdicao').classList.remove('oculto');
+    document.getElementById('idAluno').value = aluno.id;
+    document.getElementById('nome').value = aluno.nome;
+    document.getElementById('nomeResponsavel').value = aluno.nomeResponsavel || '';
+    document.getElementById('nascimento').value = aluno.nascimento;
+    calcularIdade();
+    document.getElementById('endereco').value = aluno.endereco || '';
+    document.getElementById('telefoneResponsavel').value = aluno.telefoneResponsavel || '';
+    document.getElementById('telefoneAluno').value = aluno.telefoneAluno || '';
+    document.getElementById('email').value = aluno.email || '';
+    document.getElementById('matricula').value = aluno.matricula || '';
+    document.getElementById('faixaAtual').value = aluno.faixaAtual || 'Branca';
+    document.getElementById('ultimoExame').value = aluno.ultimoExame || '';
+    document.getElementById('valorMensalidade').value = aluno.valorMensalidade || '';
+    document.getElementById('diaVencimento').value = aluno.diaVencimento || '';
+    document.getElementById('valorExameFaixa').value = aluno.valorExameFaixa || '';
+    document.getElementById('dataPrevExame').value = aluno.dataPrevExame || '';
+    document.getElementById('areaHistorico').innerHTML = '';
+    (aluno.historico || []).forEach(h => adicionarLinhaHist(h.data, h.faixa));
+}
+
+function calcularIdade() {
+    const nasc = document.getElementById('nascimento').value;
+    if(!nasc) return;
+    const hoje = new Date(), n = new Date(nasc+'T00:00:00');
+    let idade = hoje.getFullYear() - n.getFullYear();
+    const m = hoje.getMonth() - n.getMonth();
+    if(m < 0 || (m === 0 && hoje.getDate() < n.getDate())) idade--;
+    document.getElementById('idade').value = idade+' anos';
+}
+
+function adicionarLinhaHist(data='', faixa='') {
+    const area = document.getElementById('areaHistorico');
+    const div = document.createElement('div');
+    div.className = 'entrada-hist';
+    div.innerHTML = `
+        <input type="date" class="dataExame" value="${data}">
+        <select class="faixaConquistada">
+            <option value="">Selecione</option>
+            ${['Branca','Amarela','Vermelha','Laranja','Verde','Roxa','Marrom','Preta'].map(f=>`<option ${faixa===f?'selected':''}>${f}</option>`).join('')}
+        </select>
+        <button type="button" class="btn-vermelho" style="width:auto; padding:6px 10px;">✕</button>
+    `;
+    div.querySelector('.btn-vermelho').onclick = () => div.remove();
+    area.appendChild(div);
+}
+
+// --- Exibição das Listas ---
 function exibirLista() {
     const busca = document.getElementById('campoBusca').value.toLowerCase();
     let lista = carregarAlunos();
@@ -359,7 +491,10 @@ function exibirLista() {
     document.getElementById('quantidade').innerHTML = `<strong>${lista.length}</strong> aluno(s)`;
     const div = document.getElementById('listaAlunos');
     div.innerHTML = '';
-    if(!lista.length) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
+    if(!lista.length) { 
+        div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno cadastrado.</p>'; 
+        return; 
+    }
     lista.forEach(aluno => {
         const saldoMensal = calcularSaldoMensal(aluno);
         const saldoExame = calcularSaldoExame(aluno);
@@ -388,18 +523,20 @@ function exibirLista() {
         </div>`;
         div.appendChild(item);
         
-        // VINCULAÇÃO DOS BOTÕES — 100% CORRIGIDA
         const id = aluno.id;
-        item.querySelector('.mensal-btn').onclick = () => registrarMensal(id);
-        if(item.querySelector('.exame-btn')) item.querySelector('.exame-btn').onclick = () => registrarExame(id);
-        item.querySelector('.diploma-btn').onclick = () => gerarDiploma(id);
-        if(item.querySelector('.aviso-btn')) item.querySelector('.aviso-btn').onclick = () => enviarAviso(id);
-        item.querySelector('.editar-btn').onclick = () => editarAluno(id);
-        item.querySelector('.excluir-btn').onclick = () => { if(confirm('Excluir '+aluno.nome+'?')) excluirAluno(id); };
+        item.querySelector('.mensal-btn').addEventListener('click', () => registrarMensal(id));
+        if(item.querySelector('.exame-btn')) {
+            item.querySelector('.exame-btn').addEventListener('click', () => registrarExame(id));
+        }
+        item.querySelector('.diploma-btn').addEventListener('click', () => gerarDiploma(id));
+        if(item.querySelector('.aviso-btn')) {
+            item.querySelector('.aviso-btn').addEventListener('click', () => enviarAviso(id));
+        }
+        item.querySelector('.editar-btn').addEventListener('click', () => editarAluno(id));
+        item.querySelector('.excluir-btn').addEventListener('click', () => excluirAluno(id));
     });
 }
 
-// === EXIBIR PAGAMENTOS ===
 function exibirPagamentos() {
     const filtro = document.getElementById('filtroPagamento').value;
     let lista = carregarAlunos().map(a => ({
@@ -429,7 +566,10 @@ function exibirPagamentos() {
     
     const div = document.getElementById('listaPagamentos');
     div.innerHTML = '';
-    if(!lista.length) { div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno.</p>'; return; }
+    if(!lista.length) { 
+        div.innerHTML = '<p style="text-align:center; color:#666;">Nenhum aluno encontrado.</p>'; 
+        return; 
+    }
     lista.forEach(aluno => {
         const item = document.createElement('div');
         item.className = 'item-aluno';
@@ -456,102 +596,53 @@ function exibirPagamentos() {
         div.appendChild(item);
         
         const id = aluno.id;
-        item.querySelector('.mensal-btn').onclick = () => registrarMensal(id);
-        if(item.querySelector('.exame-btn')) item.querySelector('.exame-btn').onclick = () => registrarExame(id);
-        if(item.querySelector('.aviso-btn')) item.querySelector('.aviso-btn').onclick = () => enviarAviso(id);
+        item.querySelector('.mensal-btn').addEventListener('click', () => registrarMensal(id));
+        if(item.querySelector('.exame-btn')) {
+            item.querySelector('.exame-btn').addEventListener('click', () => registrarExame(id));
+        }
+        if(item.querySelector('.aviso-btn')) {
+            item.querySelector('.aviso-btn').addEventListener('click', () => enviarAviso(id));
+        }
     });
 }
 
-// === DEMAIS FUNÇÕES ===
-function enviarAviso(id) {
-    const aluno = carregarAlunos().find(a => a.id === id);
-    if(!aluno) return;
-    const tel = aluno.telefoneResponsavel.replace(/\D/g,'');
-    if(tel.length < 10) { alert('Telefone inválido!'); return; }
-    const saldoMensal = calcularSaldoMensal(aluno);
-    const saldoExame = calcularSaldoExame(aluno);
-    let msg = `⚠️ AVISO DE PENDÊNCIA
-Aluno: ${aluno.nome}
-${saldoMensal>0?`Mensalidade pendente: R$ ${saldoMensal.toFixed(2).replace('.',',')}`:''}
-${saldoExame>0?`Taxa exame pendente: R$ ${saldoExame.toFixed(2).replace('.',',')}`:''}
-Regularize, por favor. Obrigado! 🥋`;
-    window.open(`https://wa.me/55${tel}?text=${encodeURIComponent(msg)}`, '_blank');
-}
-function editarAluno(id) {
-    const aluno = carregarAlunos().find(a => a.id === id);
-    if(!aluno) return;
-    document.querySelector('[data-alvo="cadastro"]').click();
-    document.getElementById('titulo-form').textContent = 'Editar Aluno';
-    document.getElementById('btnCancelarEdicao').classList.remove('oculto');
-    document.getElementById('idAluno').value = aluno.id;
-    document.getElementById('nome').value = aluno.nome;
-    document.getElementById('nomeResponsavel').value = aluno.nomeResponsavel || '';
-    document.getElementById('nascimento').value = aluno.nascimento;
-    calcularIdade();
-    document.getElementById('endereco').value = aluno.endereco || '';
-    document.getElementById('telefoneResponsavel').value = aluno.telefoneResponsavel || '';
-    document.getElementById('telefoneAluno').value = aluno.telefoneAluno || '';
-    document.getElementById('email').value = aluno.email || '';
-    document.getElementById('matricula').value = aluno.matricula || '';
-    document.getElementById('faixaAtual').value = aluno.faixaAtual || 'Branca';
-    document.getElementById('ultimoExame').value = aluno.ultimoExame || '';
-    document.getElementById('valorMensalidade').value = aluno.valorMensalidade || '';
-    document.getElementById('diaVencimento').value = aluno.diaVencimento || '';
-    document.getElementById('valorExameFaixa').value = aluno.valorExameFaixa || '';
-    document.getElementById('dataPrevExame').value = aluno.dataPrevExame || '';
-    document.getElementById('areaHistorico').innerHTML = '';
-    (aluno.historico || []).forEach(h => adicionarLinhaHist(h.data, h.faixa));
-}
-function excluirAluno(id) { salvarAlunos(carregarAlunos().filter(a => a.id !== id)); exibirLista(); }
-function calcularIdade() {
-    const nasc = document.getElementById('nascimento').value;
-    if(!nasc) return;
-    const hoje = new Date(), n = new Date(nasc+'T00:00:00');
-    let idade = hoje.getFullYear() - n.getFullYear();
-    const m = hoje.getMonth() - n.getMonth();
-    if(m < 0 || (m === 0 && hoje.getDate() < n.getDate())) idade--;
-    document.getElementById('idade').value = idade+' anos';
-}
-function adicionarLinhaHist(data='', faixa='') {
-    const area = document.getElementById('areaHistorico');
-    const div = document.createElement('div');
-    div.className = 'entrada-hist';
-    div.innerHTML = `
-        <input type="date" class="dataExame" value="${data}">
-        <select class="faixaConquistada">
-            <option value="">Selecione</option>
-            ${['Branca','Amarela','Vermelha','Laranja','Verde','Roxa','Marrom','Preta'].map(f=>`<option ${faixa===f?'selected':''}>${f}</option>`).join('')}
-        </select>
-        <button type="button" class="btn-vermelho" style="width:auto; padding:6px 10px;">✕</button>
-    `;
-    div.querySelector('.btn-vermelho').onclick = () => div.remove();
-    area.appendChild(div);
-}
+// --- Backup e Exportação ---
 function fazerBackup() {
-    const dados = {data: new Date().toLocaleString('pt-BR'), alunos: carregarAlunos(), config: carregarConfig()};
+    const dados = {
+        data: new Date().toLocaleString('pt-BR'), 
+        alunos: carregarAlunos(), 
+        config: carregarConfig()
+    };
     const blob = new Blob([JSON.stringify(dados,null,2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `backup-karate-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.json`;
-    a.click(); URL.revokeObjectURL(url); alert('✅ Baixado!');
+    a.href = url; 
+    a.download = `backup-karate-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.json`;
+    a.click(); 
+    URL.revokeObjectURL(url); 
+    alert('✅ Backup baixado com sucesso!');
 }
+
 function restaurarBackup(arq) {
-    if(!confirm('⚠️ Substituir dados atuais?')) return;
+    if(!confirm('⚠️ Atenção: isso substituirá todos os dados atuais. Continuar?')) return;
     const leitor = new FileReader();
     leitor.onload = e => {
         try {
             const d = JSON.parse(e.target.result);
-            if(!d.alunos) throw 'Inválido';
+            if(!d.alunos) throw 'Arquivo inválido';
             salvarAlunos(d.alunos);
             if(d.config) localStorage.setItem('configAcademia', JSON.stringify(d.config));
-            alert(`✅ Restaurado! ${d.alunos.length} alunos.`);
-        } catch(err) { alert('Erro: '+err); }
+            alert(`✅ Backup restaurado!\n${d.alunos.length} alunos carregados.`);
+            exibirLista();
+            exibirPagamentos();
+        } catch(err) { alert('Erro ao restaurar: '+err); }
     };
     leitor.readAsText(arq);
 }
+
 function exportarExcel() {
     const lista = carregarAlunos();
-    if(!lista.length) { alert('Sem dados!'); return; }
+    if(!lista.length) { alert('Sem dados para exportar!'); return; }
     let csv = 'Nome;Faixa;Mensalidade;SaldoMensal;TaxaExame;SaldoExame;TelefoneResp\n';
     lista.forEach(a => {
         csv += `${a.nome};${a.faixaAtual};${(a.valorMensalidade||0).toFixed(2).replace('.',',')};${calcularSaldoMensal(a).toFixed(2).replace('.',',')};${(a.valorExameFaixa||0).toFixed(2).replace('.',',')};${calcularSaldoExame(a).toFixed(2).replace('.',',')};${a.telefoneResponsavel}\n`;
@@ -559,15 +650,24 @@ function exportarExcel() {
     const blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = `alunos-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
-    a.click(); URL.revokeObjectURL(url);
+    a.href = url; 
+    a.download = `alunos-${new Date().toLocaleDateString('pt-BR').replaceAll('/','-')}.csv`;
+    a.click(); 
+    URL.revokeObjectURL(url);
 }
 
-// === INICIALIZAÇÃO ===
+// ==================================================
+// 🚀 INICIALIZAÇÃO
+// ==================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Abas
+    const cfg = carregarConfig();
+    document.getElementById('nomeAcademia').value = cfg.nomeAcademia || '';
+    document.getElementById('cidadeAcademia').value = cfg.cidadeAcademia || '';
+    document.getElementById('nomeInstrutor').value = cfg.nomeInstrutor || '';
+    document.getElementById('assinatura2').value = cfg.assinatura2 || '';
+
     document.querySelectorAll('.aba').forEach(aba => {
-        aba.onclick = () => {
+        aba.addEventListener('click', () => {
             document.querySelectorAll('.aba').forEach(a => a.classList.remove('ativa'));
             document.querySelectorAll('.conteudo-aba').forEach(c => c.classList.remove('visivel'));
             aba.classList.add('ativa');
@@ -575,23 +675,19 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById(alvo).classList.add('visivel');
             if(alvo === 'lista') exibirLista();
             if(alvo === 'pagamentos') exibirPagamentos();
-        };
+        });
     });
 
-    // Config
-    carregarConfig();
-    document.getElementById('btnSalvarConfig').onclick = salvarConfig;
-
-    // Formulário
-    document.getElementById('nascimento').onchange = calcularIdade;
-    document.getElementById('formAluno').onsubmit = e => {
+    document.getElementById('btnSalvarConfig').addEventListener('click', salvarConfig);
+    document.getElementById('nascimento').addEventListener('change', calcularIdade);
+    document.getElementById('formAluno').addEventListener('submit', e => {
         e.preventDefault();
         const nome = document.getElementById('nome').value.trim();
         const nasc = document.getElementById('nascimento').value;
         const tel = document.getElementById('telefoneResponsavel').value.replace(/\D/g,'');
-        if(!nome) { alert('Nome!'); return; }
-        if(!nasc) { alert('Nascimento!'); return; }
-        if(tel.length < 10) { alert('Telefone incompleto!'); return; }
+        if(!nome) { alert('Informe o nome do aluno!'); return; }
+        if(!nasc) { alert('Informe a data de nascimento!'); return; }
+        if(tel.length < 10) { alert('Informe um número de WhatsApp válido!'); return; }
 
         const lista = carregarAlunos();
         const id = document.getElementById('idAluno').value || Date.now();
@@ -626,28 +722,31 @@ document.addEventListener('DOMContentLoaded', () => {
         const ind = lista.findIndex(a => a.id == id);
         if(ind >= 0) {
             dados.pagamentos = lista[ind].pagamentos || [];
-            dados.pagamentosExame = lista[ind].pagamentosExame || [];
+            dados.pagamentos
+Exame: lista[ind].pagamentosExame || [];
             lista[ind] = dados;
-            alert('✅ Atualizado: '+dados.nome);
+            alert('✅ Aluno atualizado!');
         } else {
             lista.push(dados);
-            alert('✅ Cadastrado: '+dados.nome);
+            alert('✅ Aluno cadastrado!');
         }
         salvarAlunos(lista);
         document.querySelector('[data-alvo="lista"]').click();
-    };
+    });
 
-    // Outros botões
-    document.getElementById('btnAddHist').onclick = () => adicionarLinhaHist();
-    document.getElementById('btnCancelarEdicao').onclick = () => document.querySelector('[data-alvo="lista"]').click();
-    document.getElementById('campoBusca').oninput = exibirLista;
-    document.getElementById('btnExportar').onclick = exportarExcel;
-    document.getElementById('filtroPagamento').onchange = exibirPagamentos;
-    document.getElementById('btnBackup').onclick = fazerBackup;
-    document.getElementById('arquivoBackup').onchange = e => restaurarBackup(e.target.files[0]);
-    document.getElementById('btnFecharDiploma').onclick = fecharDiploma;
-    document.getElementById('modalDiploma').onclick = e => { if(e.target.id==='modalDiploma') fecharDiploma(); };
-    document.getElementById('btnImprimir').onclick = () => window.print();
+    // Outros botões gerais
+    document.getElementById('btnAddHist').addEventListener('click', () => adicionarLinhaHist());
+    document.getElementById('btnCancelarEdicao').addEventListener('click', () => document.querySelector('[data-alvo="lista"]').click());
+    document.getElementById('campoBusca').addEventListener('input', exibirLista);
+    document.getElementById('btnExportar').addEventListener('click', exportarExcel);
+    document.getElementById('filtroPagamento').addEventListener('change', exibirPagamentos);
+    document.getElementById('btnBackup').addEventListener('click', fazerBackup);
+    document.getElementById('arquivoBackup').addEventListener('change', e => restaurarBackup(e.target.files[0]));
+    document.getElementById('btnFecharDiploma').addEventListener('click', fecharDiploma);
+    document.getElementById('modalDiploma').addEventListener('click', e => { 
+        if(e.target.id === 'modalDiploma') fecharDiploma(); 
+    });
+    document.getElementById('btnImprimir').addEventListener('click', () => window.print());
 });
 </script>
 </body>
